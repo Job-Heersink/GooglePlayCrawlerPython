@@ -1,0 +1,56 @@
+https://www.slant.co/versus/10237/10238/~google-play-crawler-java-api_vs_google-play-unofficial-python-api
+https://www.segmentationfault.fr/publications/reversing-google-play-and-micro-protobuf-applications/
+article on reversing protobuf: https://sysdream.com/news/lab/2012-06-06-reverse-engineering-of-protobuf-based-applications/
+
+https://github.com/google/protobuf-gradle-plugin
+https://github.com/protocolbuffers/protobuf
+
+https://github.com/Akdeniz/google-play-crawler
+https://github.com/yeriomin/play-store-api
+https://github.com/HamidrezaMoradi/APK-Downloader
+
+https://google.github.io/google-api-cpp-client/latest/guide/oauth2.html
+
+https://developers.google.com/api-client-library/java/google-api-java-client/oauth2?hl=en_US
+https://developers.google.com/oauthplayground/ <-- VERY USEFULL
+
+actual recent file:
+https://github.com/egbertbouman/APKfetch <-- this one has succesfull login, but cannot get the download url
+https://github.com/ClaudiuGeorgiu/PlaystoreDownloader/tree/master/playstore
+
+encountered issues when building:
+oudated plugin used by maven: com.google.protobuf.tools. (fixed by updating the dependency to most recent version (was 2.5 is now 3.9)) and commenting out plugin.
+fixed by manually compiling protobuf and creating java class files without the use of the plugin, because gradle was needed to make the plugin work.
+succesfull Build after that!
+
+encountered issues when running:
+app is using the Android Cloud to Device Messaging ACDM for login (and probably for other things too) which has been deprecated since august 2012 and completely shut down after october 20, 2015.
+Since the code is over 7 years old, this was bound to happen.
+some things are implemented with the GCM which is newer, but apperently was announced deprecated on april 2018 and shut down may 2019.
+I need to make a full conversion from GCM and ACDM to Firebase Cloud Messaging FCM.
+so GooglePlayApi.java needs a complete overhaul.
+tried logging in with my credentials, both my personal account and recently created temporary acount (credentials see below)
+got a authentication error. closer look revealed that is was a 403 code. Which just means im not allowed to do anything.
+
+I moved away from the Akdeniz crawler and looked for a more promessing Google play api in java. I saw the yeriomin API that was based on Akdeniz but was last updated a year ago (in contrast to Akdeniz, which has last been updated 7 years ago, this is good news!).
+Building and testing went perfect, so i regained hope. But i saw this program still uses the old method of getting credentials, which didn't work with the last one as well, so i was sceptical about wheter it worked or not. But it passed its test so i didnt thinks much of it.
+after 4 hours of trying to get a grip on the code i decided to test it with my account.
+the same error from akdeniz reveiled itself.
+Apperently yeriomin stored the output of requests on disk beforehand. So when the program was tested by Junit, it found the data on the disk first and just read that instead of making a life call to google play.
+This showed that the code indeed used to work, but is no longer useable for life requests. So i was back to where i started.
+
+I looked around for python googple play api's, but discovered they use the same method for getting the credentials. Which proved to be unsuccesfull.
+
+I stubled upon a official google service API developed for C++. I learned about OAuth2, maybe this is promising. turned out to be deprecated as well.
+
+Read about the Oauth2 authentication google uses. I need to select specific scopes to get the right permissions. not sure which scopes to use
+
+found a python program that succesfully implemented authentication.
+with a little modification (on the proto file and compiling) also able to get app details.
+maybe even download app apk. we'll see.
+
+just noticed that this python program does work! but only for apps that i have purchased before.
+
+login info
+email: playstorecrawler00@gmail.com
+ww: IAmAGooglePlayCrawler
