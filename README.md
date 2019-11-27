@@ -1,5 +1,5 @@
-# APKfetch
-Library for downloading APK files from the Google Play store.
+# GooglePLayCrawlerPython
+this project is based on https://github.com/egbertbouman/APKfetch
 
 
 ### Dependencies
