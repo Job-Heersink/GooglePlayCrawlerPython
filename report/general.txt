@@ -58,6 +58,12 @@ it uses a Samsung Galaxy Gio GT-S5660 as a fake device. Just for reference The g
 google play api (that doesnt build) has a file with specifications for a Samsung Galaxy Tab S3 witch can run on 9. this should be recent enough to make it work.
 still incompatible, found an app which shows all the detailed info of my SAMSUNG Galaxy A70, which is CAME with android 9 preinstalled. If this is not compatible i do not know what is.
 
+Ive made it work by just including my android ID instead of requesting from google.
+
+Ive got a list of permissions from you, but as you said, this includes actions as well. I found a list on the developer site of google: "https://developer.android.com/reference/android/Manifest.permission#constants_2" whitch is both up to date and more trustworthy than some file on github. i extracted the information and put it into a csv file by scraping the site.
+
+I managed to get the formatting correct. There is one problem though. an app can have external permissions (not of the android.permission package but from their own package or a package like com.samsung.android.app.spage.permission or com.spotify.music.permission). ofcourse we wont be able to include ALL permissions like that into one file. so is this approach a good idea?
+
 
 login info
 email: playstorecrawler00@gmail.com
