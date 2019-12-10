@@ -2,22 +2,24 @@ from __future__ import print_function
 
 import os
 import sys
-import json
-import gzip
 import time
 import argparse
 import requests
-from urllib3.connectionpool import xrange
+import csv
 
 import apkfetch_pb2
 
 from util import encrypt
+
+DOWNLOAD_FOLDER_PATH = 'apps/'
 
 GOOGLE_LOGIN_URL = 'https://android.clients.google.com/auth'
 GOOGLE_CHECKIN_URL = 'https://android.clients.google.com/checkin'
 GOOGLE_DETAILS_URL = 'https://android.clients.google.com/fdfe/details'
 GOOGLE_DELIVERY_URL = 'https://android.clients.google.com/fdfe/delivery'
 GOOGLE_PURCHASE_URL = 'https://android.clients.google.com/fdfe/purchase'
+GOOGLE_BROWSE_URL = 'https://android.clients.google.com/fdfe/browse'
+GOOGLE_LIST_URL = 'https://android.clients.google.com/fdfe/list'
 
 LOGIN_USER_AGENT = 'GoogleLoginService/1.3 (gts3llte)'
 MARKET_USER_AGENT = 'Android-Finsky/5.7.10 (api=3,versionCode=80371000,sdk=24,device=falcon_umts,hardware=qcom,product=falcon_reteu,platformVersionRelease=4.4.4,model=XT1032,buildId=KXB21.14-L1.40,isWideScreen=0)'
@@ -196,7 +198,7 @@ class APKfetch(object):
 
         return self.auth is not None
 
-    def version(self, package_name):
+    def details(self, package_name):
         headers = {'X-DFE-Device-Id': self.androidid,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
@@ -209,11 +211,11 @@ class APKfetch(object):
 
         details_response = apkfetch_pb2.ResponseWrapper()
         details_response.ParseFromString(response.content)
-        # print(details_response.payload.detailsResponse.docV2)
-        version = details_response.payload.detailsResponse.docV2.details.appDetails.versionCode
-        if not version:
-            raise RuntimeError('Could not get version-code')
-        return version
+        print(details_response.payload.detailsResponse.docV2)
+        details = details_response.payload.detailsResponse.docV2
+        if not details:
+            raise RuntimeError('Could not get details')
+        return details
 
     def get_download_url(self, package_name, version_code):
         headers = {'X-DFE-Device-Id': self.androidid,
@@ -221,7 +223,7 @@ class APKfetch(object):
                    'Accept-Encoding': '',
                    'Host': 'android.clients.google.com',
                    'Authorization': 'GoogleLogin Auth=' + self.auth,
-                   'Content-Typ': 'application/x-www-form-urlencoded; charset=UTF-8'}
+                   'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
 
         data = {'doc': package_name,
                 'ot': '1',
@@ -276,7 +278,7 @@ class APKfetch(object):
             'X-DFE-Device-Id': self.androidid,
             "X-DFE-Client-Id": "am-android-google",
             'Host': 'android.clients.google.com',
-            'Content-Typ': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
             "X-DFE-MCCMNC": "310260",
             "X-DFE-Network-Type": "4",
             "X-DFE-Content-Filters": "",
@@ -300,14 +302,6 @@ class APKfetch(object):
             downloadtoken = response.payload.buyResponse.downloadToken
             return downloadtoken
 
-
-    def list(self, package_name):
-        vc_new = self.version(package_name)
-        for vc in xrange(vc_new, -1, -1):
-            url = self.get_download_url(package_name, vc)
-            if url:
-                yield vc
-
     def fetch(self, package_name, version_code, apk_fn=None):
         url = self.get_download_url(package_name, version_code)
         if not url:
@@ -316,7 +310,7 @@ class APKfetch(object):
         response = self.session.get(url, headers={'User-Agent': DOWNLOAD_USER_AGENT},
                                     stream=True, allow_redirects=True)
 
-        apk_fn = apk_fn or (package_name + '.apk')
+        apk_fn = apk_fn or (DOWNLOAD_FOLDER_PATH+package_name + '/' + package_name + '.apk')
         if os.path.exists(apk_fn):
             os.remove(apk_fn)
 
@@ -325,13 +319,24 @@ class APKfetch(object):
                 if chunk:
                     fp.write(chunk)
                     fp.flush()
+            fp.close()
 
         return os.path.exists(apk_fn)
+
+    def store(self, details):
+        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/userdescription.csv", "rw") as csvfile:
+            csvfile.close()
+
+        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/technical.csv", "rw") as csvfile:
+            csvfile.close()
+
+        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/permissions.csv", "rw") as csvfile:
+            csvfile.close()
 
 
 def main(argv):
     # parse arguments
-    parser = argparse.ArgumentParser(add_help=False, description=('Fetch APK files from the Google Play store'))
+    parser = argparse.ArgumentParser(add_help=False, description=('Download APK files from the google play store and retrieve their information'))
     parser.add_argument('--help', '-h', action='help', default=argparse.SUPPRESS,
                         help='Show this help message and exit')
     parser.add_argument('--user', '-u', help='Google username')
@@ -364,19 +369,16 @@ def main(argv):
         if not androidid and apk.androidid:
             print('AndroidID', apk.androidid)
 
-        if args.search:
-            print('The following versions are available:', end='')
-            for vc in apk.list(package):
-                print(' %d' % vc, end='')
-                # We don't want to get blocked..
-                time.sleep(1)
-            print('')
-        else:
-            version = version or apk.version(package)
-            #if apk.fetch(package, version):
-            #    print('Downloaded version', version)
-            if apk.purchase(package, version):
-                print("succesfull purchase")
+        details = apk.details(package)
+        version = version or details.details.appDetails.versionCode
+
+        if not os.path.exists(DOWNLOAD_FOLDER_PATH+package):
+            os.mkdir(DOWNLOAD_FOLDER_PATH+package)
+
+        if apk.purchase(package, version):
+            print("succesfull purchase")
+        if apk.fetch(package, version):
+            print('Downloaded version', version)
 
     except Exception as e:
         print('Error:', str(e))
