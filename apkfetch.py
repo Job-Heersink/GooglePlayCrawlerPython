@@ -324,14 +324,66 @@ class APKfetch(object):
         return os.path.exists(apk_fn)
 
     def store(self, details):
-        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/userdescription.csv", "rw") as csvfile:
+        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/userdescription.csv", "w") as csvfile:
+            file = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            #TODO implement the rest from detailsURL
+            #TODO fix uninteded commas in messages
+            file.writerow(['Pkgname', details.docid])
+            file.writerow(['backendPkgname', details.backendDocid])
+            file.writerow(['Title', details.title])
+            file.writerow(['Description', '"{}"'.format(details.descriptionHtml)])
+            file.writerow(['Url', "!"])
+            file.writerow(['Genre', "!"])
+            #TODO implement category info
+            file.writerow(['Type', details.details.appDetails.appType])
+            #TODO fix this
+            #file.writerow(['Price', details.offer.micros/1000000, details.offer.currencyCode])
+
+            file.writerow(['Downloads', details.details.appDetails.numDownloads])
+            file.writerow(['Rating', details.relatedLinks.rated.label])
+            file.writerow(['StarRating', details.aggregateRating.starRating])
+            file.writerow(['RatingCount', details.aggregateRating.ratingsCount])
+            file.writerow(['ReviewsAverage', "!"])
+            file.writerow(['FiveStarRatings', details.aggregateRating.fiveStarRatings])
+            file.writerow(['FourStarRatings', details.aggregateRating.fourStarRatings])
+            file.writerow(['ThreeStarRatings', details.aggregateRating.threeStarRatings])
+            file.writerow(['TwoStarRatings', details.aggregateRating.twoStarRatings])
+            file.writerow(['OneStarRatings', details.aggregateRating.oneStarRatings])
+
+            file.writerow(['DeveloperAddress', "!"])
+            file.writerow(['DeveloperEmail', details.details.appDetails.developerEmail])
+            file.writerow(['DeveloperWebsite', details.details.appDetails.developerWebsite])
+            file.writerow(['developerName', details.details.appDetails.developerName])
+            file.writerow(['Creator',details.creator])
+
+            file.writerow(['PrivacyPolicyLink', details.relatedLinks.privacyPolicyUrl])
+            #TODO: youMightAlsoLike can be implemented, related links etc
+
+            file.writerow(['CurrentVersion',details.details.appDetails.versionCode])
+            file.writerow(['CurrentVersionString', details.details.appDetails.versionString])
+            file.writerow(['LastUpdated', details.details.appDetails.uploadDate])
+            file.writerow(['recentChanges', '"{}"'.format(details.details.appDetails.recentChangesHtml)])
+            file.writerow(['AndroidVersion', "!"])
+
+            file.writerow(['FileSize',details.details.appDetails.installationSize])
+            file.writerow(['isUnstable', details.details.appDetails.unstable])
+            file.writerow(['hasInstantLink', details.details.appDetails.hasInstantLink])
+            file.writerow(['containsAds', details.details.appDetails.containsAds])
             csvfile.close()
 
-        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/technical.csv", "rw") as csvfile:
+        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/technical.csv", "w") as csvfile:
             csvfile.close()
 
-        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/permissions.csv", "rw") as csvfile:
+        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/permissions.csv", "w") as csvfile:
             csvfile.close()
+
+        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/images.csv", "w") as csvfile:
+            csvfile.close()
+
+        with open(DOWNLOAD_FOLDER_PATH+details.docid+"/dependensies.csv", "w") as csvfile:
+            csvfile.close()
+
+
 
 
 def main(argv):
@@ -375,8 +427,12 @@ def main(argv):
         if not os.path.exists(DOWNLOAD_FOLDER_PATH+package):
             os.mkdir(DOWNLOAD_FOLDER_PATH+package)
 
+        apk.store(details)
+
+        #TODO maybe you can browse by putting the related in link front of android.user.google
+
         if apk.purchase(package, version):
-            print("succesfull purchase")
+            print("successful purchase")
         if apk.fetch(package, version):
             print('Downloaded version', version)
 
