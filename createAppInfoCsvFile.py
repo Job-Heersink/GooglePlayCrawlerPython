@@ -5,7 +5,7 @@ import csv
 
 def main(argv):
 
-    with open("apps/userdescription.csv", "w") as csvfile:
+    with open("apps/appinfo.csv", "w") as csvfile:
         file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         file.writerow(
             ['Pkgname', 'backendPkgname', 'Title', 'Description', 'ShortDescription', 'Url', 'Genre', 'Type',

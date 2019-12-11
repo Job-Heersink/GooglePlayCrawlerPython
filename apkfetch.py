@@ -219,7 +219,7 @@ class APKfetch(object):
             raise RuntimeError('Could not get details')
         return details
 
-    def reviews(self, package_name):
+    def reviews(self, package_name, amount=50):
         headers = {'X-DFE-Device-Id': self.androidid,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
@@ -228,7 +228,7 @@ class APKfetch(object):
                    'User-Agent': MARKET_USER_AGENT}
 
         params = {'doc': package_name,
-                  'n': 50}
+                  'n': amount}
         response = self.session.get(GOOGLE_REVIEWS_URL, params=params, headers=headers, allow_redirects=True)
 
         review_response = apkfetch_pb2.ResponseWrapper()
@@ -348,7 +348,7 @@ class APKfetch(object):
         return os.path.exists(apk_fn)
 
     def store(self, details, reviews=None):
-        with open("apps/userdescription.csv", "a") as csvfile:
+        with open("apps/appinfo.csv", "a") as csvfile:
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file.writerow([details.docid, details.backendDocid, details.title, details.descriptionHtml,
                            details.descriptionShort,
@@ -370,11 +370,8 @@ class APKfetch(object):
                            details.details.appDetails.installationSize, details.details.appDetails.unstable,
                            details.details.appDetails.hasInstantLink, details.details.appDetails.containsAds])
             # TODO implement the rest from detailsURL
-            # TODO fix uninteded commas in messages
 
             # TODO implement category info
-
-            # TODO fix this
 
             # TODO: youMightAlsoLike can be implemented, related links etc
             csvfile.close()
