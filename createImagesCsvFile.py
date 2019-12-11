@@ -9,14 +9,10 @@ PAGE = '<li class="devsite-nav-item"><a href="#ACCEPT_HANDOVER" class="devsite-n
 
 
 def main(argv):
-    tree = html.fromstring(PAGE)
-    permissions = tree.xpath('//span[@class="devsite-nav-text"]/text()')
 
-    with open("templatePermissions.csv", "w") as csvfile:
+    with open("apps/images.csv", "w") as csvfile:
         file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for p in permissions:
-            file.writerow(["android.permission."+p])
-
+        file.writerow(["Pkgname","ImageUrls"])
         csvfile.close()
 
 if __name__ == "__main__":

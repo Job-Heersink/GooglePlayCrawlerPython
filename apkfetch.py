@@ -326,78 +326,68 @@ class APKfetch(object):
         return os.path.exists(apk_fn)
 
     def store(self, details):
-        with open(DOWNLOAD_FOLDER_PATH + details.docid + "/userdescription.csv", "w") as csvfile:
+        with open("apps/userdescription.csv", "a") as csvfile:
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            file.writerow([details.docid, details.backendDocid, details.title, details.descriptionHtml,
+                           details.descriptionShort, "https://play.google.com/store/apps/details?"+details.docid+"&hl=en", "!TODO GENRE!",
+                           details.details.appDetails.appType,
+                           details.offer[0].micros, details.offer[0].currencyCode, details.details.appDetails.numDownloads, details.relatedLinks.rated.label,
+                           details.aggregateRating.starRating, details.aggregateRating.ratingsCount,
+                           details.aggregateRating.fiveStarRatings,
+                           details.aggregateRating.fourStarRatings, details.aggregateRating.threeStarRatings,
+                           details.aggregateRating.twoStarRatings, details.aggregateRating.oneStarRatings, details.details.appDetails.developerAddress,
+                           details.details.appDetails.developerEmail, details.details.appDetails.developerWebsite,
+                           details.details.appDetails.developerName, details.creator,
+                           details.relatedLinks.privacyPolicyUrl,
+                           details.details.appDetails.versionCode, details.details.appDetails.versionString,
+                           details.details.appDetails.uploadDate,
+                           details.details.appDetails.recentChangesHtml, "!!!",
+                           details.details.appDetails.installationSize, details.details.appDetails.unstable,
+                           details.details.appDetails.hasInstantLink, details.details.appDetails.containsAds])
             # TODO implement the rest from detailsURL
             # TODO fix uninteded commas in messages
-            file.writerow(['Pkgname', details.docid])
-            file.writerow(['backendPkgname', details.backendDocid])
-            file.writerow(['Title', details.title])
-            file.writerow(['Description', '"{}"'.format(details.descriptionHtml)])
-            file.writerow(['Url', "!"])
-            file.writerow(['Genre', "!"])
+
             # TODO implement category info
-            file.writerow(['Type', details.details.appDetails.appType])
+
             # TODO fix this
-            # file.writerow(['Price', details.offer.micros/1000000, details.offer.currencyCode])
 
-            file.writerow(['Downloads', details.details.appDetails.numDownloads])
-            file.writerow(['Rating', details.relatedLinks.rated.label])
-            file.writerow(['StarRating', details.aggregateRating.starRating])
-            file.writerow(['RatingCount', details.aggregateRating.ratingsCount])
-            file.writerow(['ReviewsAverage', "!"])
-            file.writerow(['FiveStarRatings', details.aggregateRating.fiveStarRatings])
-            file.writerow(['FourStarRatings', details.aggregateRating.fourStarRatings])
-            file.writerow(['ThreeStarRatings', details.aggregateRating.threeStarRatings])
-            file.writerow(['TwoStarRatings', details.aggregateRating.twoStarRatings])
-            file.writerow(['OneStarRatings', details.aggregateRating.oneStarRatings])
-
-            file.writerow(['DeveloperAddress', "!"])
-            file.writerow(['DeveloperEmail', details.details.appDetails.developerEmail])
-            file.writerow(['DeveloperWebsite', details.details.appDetails.developerWebsite])
-            file.writerow(['developerName', details.details.appDetails.developerName])
-            file.writerow(['Creator', details.creator])
-
-            file.writerow(['PrivacyPolicyLink', details.relatedLinks.privacyPolicyUrl])
             # TODO: youMightAlsoLike can be implemented, related links etc
-
-            file.writerow(['CurrentVersion', details.details.appDetails.versionCode])
-            file.writerow(['CurrentVersionString', details.details.appDetails.versionString])
-            file.writerow(['LastUpdated', details.details.appDetails.uploadDate])
-            file.writerow(['recentChanges', '"{}"'.format(details.details.appDetails.recentChangesHtml)])
-            file.writerow(['AndroidVersion', "!"])
-
-            file.writerow(['FileSize', details.details.appDetails.installationSize])
-            file.writerow(['isUnstable', details.details.appDetails.unstable])
-            file.writerow(['hasInstantLink', details.details.appDetails.hasInstantLink])
-            file.writerow(['containsAds', details.details.appDetails.containsAds])
             csvfile.close()
 
-        with open(DOWNLOAD_FOLDER_PATH + details.docid + "/permissions.csv", "w") as csvfile:
+        with open("apps/permissions.csv", "a") as csvfile:
             with open("templatePermissions.csv", "r") as permissionsFile:
                 permissions = csv.reader(permissionsFile, delimiter=',', quotechar='"')
                 file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                haspermission = [details.docid]
                 for row in permissions:
                     if row[0] in details.details.appDetails.permission:
-                        file.writerow([row[0], 1])
+                        haspermission += [1]
                     else:
-                        file.writerow([row[0], 0])
+                        haspermission += [0]
 
-                # TODO now it just secretly adds unknown fields
-                for row in details.details.appDetails.permission:
-                    if not row.startswith("android.permission."):
-                        file.writerow([row, 1])
-
+                file.writerow(haspermission)
                 permissionsFile.close()
             csvfile.close()
 
-        with open(DOWNLOAD_FOLDER_PATH + details.docid + "/technical.csv", "w") as csvfile:
+        with open("apps/externalpermissions.csv", "a") as csvfile:
+            file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            externalpermissions = [details.docid]
+            for row in details.details.appDetails.permission:
+                if not row.startswith("android.permission."):
+                    externalpermissions += [row]
+
+            file.writerow(externalpermissions)
             csvfile.close()
 
-        with open(DOWNLOAD_FOLDER_PATH + details.docid + "/images.csv", "w") as csvfile:
-            csvfile.close()
+        # TODO implement technical
 
-        with open(DOWNLOAD_FOLDER_PATH + details.docid + "/dependensies.csv", "w") as csvfile:
+        with open("apps/images.csv", "a") as csvfile:
+            file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            imageurls = [details.docid]
+            for image in details.image:
+                imageurls += [image.imageUrl]
+
+            file.writerow(imageurls)
             csvfile.close()
 
 
