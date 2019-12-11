@@ -20,6 +20,7 @@ GOOGLE_DELIVERY_URL = 'https://android.clients.google.com/fdfe/delivery'
 GOOGLE_PURCHASE_URL = 'https://android.clients.google.com/fdfe/purchase'
 GOOGLE_BROWSE_URL = 'https://android.clients.google.com/fdfe/browse'
 GOOGLE_LIST_URL = 'https://android.clients.google.com/fdfe/list'
+GOOGLE_REVIEWS_URL = "https://android.clients.google.com/fdfe/rev"
 
 LOGIN_USER_AGENT = 'GoogleLoginService/1.3 (gts3llte)'
 MARKET_USER_AGENT = 'Android-Finsky/5.7.10 (api=3,versionCode=80371000,sdk=24,device=falcon_umts,hardware=qcom,product=falcon_reteu,platformVersionRelease=4.4.4,model=XT1032,buildId=KXB21.14-L1.40,isWideScreen=0)'
@@ -218,6 +219,27 @@ class APKfetch(object):
             raise RuntimeError('Could not get details')
         return details
 
+    def reviews(self, package_name):
+        headers = {'X-DFE-Device-Id': self.androidid,
+                   'X-DFE-Client-Id': 'am-android-google',
+                   'Accept-Encoding': '',
+                   'Host': 'android.clients.google.com',
+                   'Authorization': 'GoogleLogin Auth=' + self.auth,
+                   'User-Agent': MARKET_USER_AGENT}
+
+        params = {'doc': package_name,
+                  'n': 50}
+        response = self.session.get(GOOGLE_REVIEWS_URL, params=params, headers=headers, allow_redirects=True)
+
+        review_response = apkfetch_pb2.ResponseWrapper()
+        review_response.ParseFromString(response.content)
+
+        if not review_response:
+            raise RuntimeError('Could not get reviews')
+        if review_response.commands.displayErrorMessage != "":
+            raise RuntimeError('error getting reviews: ' + review_response.commands.displayErrorMessage)
+        return review_response.payload.reviewResponse.getResponse
+
     def get_download_url(self, package_name, version_code):
         headers = {'X-DFE-Device-Id': self.androidid,
                    'X-DFE-Client-Id': 'am-android-google',
@@ -325,17 +347,20 @@ class APKfetch(object):
 
         return os.path.exists(apk_fn)
 
-    def store(self, details):
+    def store(self, details, reviews=None):
         with open("apps/userdescription.csv", "a") as csvfile:
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file.writerow([details.docid, details.backendDocid, details.title, details.descriptionHtml,
-                           details.descriptionShort, "https://play.google.com/store/apps/details?"+details.docid+"&hl=en", "!TODO GENRE!",
+                           details.descriptionShort,
+                           "https://play.google.com/store/apps/details?" + details.docid + "&hl=en", "!TODO GENRE!",
                            details.details.appDetails.appType,
-                           details.offer[0].micros, details.offer[0].currencyCode, details.details.appDetails.numDownloads, details.relatedLinks.rated.label,
+                           details.offer[0].micros, details.offer[0].currencyCode,
+                           details.details.appDetails.numDownloads, details.relatedLinks.rated.label,
                            details.aggregateRating.starRating, details.aggregateRating.ratingsCount,
                            details.aggregateRating.fiveStarRatings,
                            details.aggregateRating.fourStarRatings, details.aggregateRating.threeStarRatings,
-                           details.aggregateRating.twoStarRatings, details.aggregateRating.oneStarRatings, details.details.appDetails.developerAddress,
+                           details.aggregateRating.twoStarRatings, details.aggregateRating.oneStarRatings,
+                           details.details.appDetails.developerAddress,
                            details.details.appDetails.developerEmail, details.details.appDetails.developerWebsite,
                            details.details.appDetails.developerName, details.creator,
                            details.relatedLinks.privacyPolicyUrl,
@@ -390,6 +415,15 @@ class APKfetch(object):
             file.writerow(imageurls)
             csvfile.close()
 
+        with open("apps/reviews.csv", "a") as csvfile:
+            file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+            for data in reviews.review:
+                file.writerow([details.docid, data.documentVersion, data.timestampMsec, data.starRating, data.comment,
+                               data.userProfile.personId, data.userProfile.name, data.userProfile.image[0].imageUrl])
+
+            csvfile.close()
+
 
 def main(argv):
     # parse arguments
@@ -427,18 +461,23 @@ def main(argv):
         if not androidid and apk.androidid:
             print('AndroidID', apk.androidid)
 
+        time.sleep(1)
         details = apk.details(package)
         version = version or details.details.appDetails.versionCode
+        time.sleep(1)
+        reviews = apk.reviews(package)
 
         if not os.path.exists(DOWNLOAD_FOLDER_PATH + package):
             os.mkdir(DOWNLOAD_FOLDER_PATH + package)
 
-        apk.store(details)
+        apk.store(details, reviews)
 
         # TODO maybe you can browse by putting the related in link front of android.user.google
 
+        time.sleep(1)
         if apk.purchase(package, version):
             print("successful purchase")
+        time.sleep(1)
         if apk.fetch(package, version):
             print('Downloaded version', version)
 
