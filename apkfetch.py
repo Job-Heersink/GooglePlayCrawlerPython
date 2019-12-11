@@ -11,6 +11,8 @@ import apkfetch_pb2
 
 from util import encrypt
 
+ITERMAX = 5
+
 DOWNLOAD_FOLDER_PATH = 'apps/'
 
 GOOGLE_LOGIN_URL = 'https://android.clients.google.com/auth'
@@ -21,6 +23,7 @@ GOOGLE_PURCHASE_URL = 'https://android.clients.google.com/fdfe/purchase'
 GOOGLE_BROWSE_URL = 'https://android.clients.google.com/fdfe/browse'
 GOOGLE_LIST_URL = 'https://android.clients.google.com/fdfe/list'
 GOOGLE_REVIEWS_URL = "https://android.clients.google.com/fdfe/rev"
+GOOGLE_FDFE_URL = "https://android.clients.google.com/fdfe"
 
 LOGIN_USER_AGENT = 'GoogleLoginService/1.3 (gts3llte)'
 MARKET_USER_AGENT = 'Android-Finsky/5.7.10 (api=3,versionCode=80371000,sdk=24,device=falcon_umts,hardware=qcom,product=falcon_reteu,platformVersionRelease=4.4.4,model=XT1032,buildId=KXB21.14-L1.40,isWideScreen=0)'
@@ -78,6 +81,7 @@ class APKfetch(object):
     def __init__(self):
         self.session = requests.Session()
         self.user = self.passwd = self.androidid = self.token = self.auth = None
+        self.iter = 0;
 
     def request_service(self, service, app, user_agent=LOGIN_USER_AGENT):
         self.session.headers.update({'User-Agent': user_agent,
@@ -200,6 +204,8 @@ class APKfetch(object):
 
         return self.auth is not None
 
+    #todo: implement bulk details
+
     def details(self, package_name):
         headers = {'X-DFE-Device-Id': self.androidid,
                    'X-DFE-Client-Id': 'am-android-google',
@@ -213,7 +219,7 @@ class APKfetch(object):
 
         details_response = apkfetch_pb2.ResponseWrapper()
         details_response.ParseFromString(response.content)
-        print(details_response.payload.detailsResponse.docV2)
+        #print(details_response.payload.detailsResponse.docV2)
         details = details_response.payload.detailsResponse.docV2
         if not details:
             raise RuntimeError('Could not get details')
@@ -334,7 +340,7 @@ class APKfetch(object):
                                     stream=True, allow_redirects=True)
 
         print("downloading...")
-        apk_fn = apk_fn or (DOWNLOAD_FOLDER_PATH + package_name + '/' + package_name + '.apk')
+        apk_fn = apk_fn or (DOWNLOAD_FOLDER_PATH + package_name + '.apk')
         if os.path.exists(apk_fn):
             os.remove(apk_fn)
 
@@ -346,6 +352,24 @@ class APKfetch(object):
             fp.close()
 
         return os.path.exists(apk_fn)
+
+    def getrelated(self,browsestream):
+        headers = {'X-DFE-Device-Id': self.androidid,
+                   'X-DFE-Client-Id': 'am-android-google',
+                   'Accept-Encoding': '',
+                   'Host': 'android.clients.google.com',
+                   'Authorization': 'GoogleLogin Auth=' + self.auth,
+                   'User-Agent': MARKET_USER_AGENT}
+
+        response = self.session.get(GOOGLE_FDFE_URL+"/"+browsestream, params=None, headers=headers, allow_redirects=True)
+
+        related_response = apkfetch_pb2.ResponseWrapper()
+        related_response.ParseFromString(response.content)
+        #print(related_response.preFetch[0].response.payload.listResponse.doc)
+
+        if not related_response:
+            raise RuntimeError('Could not get related apps')
+        return related_response.preFetch[0].response.payload.listResponse.doc[0]
 
     def store(self, details, reviews=None):
         with open("apps/appinfo.csv", "a") as csvfile:
@@ -369,11 +393,9 @@ class APKfetch(object):
                            details.details.appDetails.recentChangesHtml, "!!!",
                            details.details.appDetails.installationSize, details.details.appDetails.unstable,
                            details.details.appDetails.hasInstantLink, details.details.appDetails.containsAds])
-            # TODO implement the rest from detailsURL
 
             # TODO implement category info
 
-            # TODO: youMightAlsoLike can be implemented, related links etc
             csvfile.close()
 
         with open("apps/permissions.csv", "a") as csvfile:
@@ -421,6 +443,34 @@ class APKfetch(object):
 
             csvfile.close()
 
+    def crawl(self, package, visitedpackages=[]):
+        print("started crawling through "+package+" on iteration: {}".format(self.iter))
+        details = self.details(package)
+        version = details.details.appDetails.versionCode
+        time.sleep(1)
+        reviews = self.reviews(package)
+
+        # TODO can even get more related links like similar apps, more from spotify etc
+
+        self.store(details, reviews)
+
+        #time.sleep(1)
+        #if self.purchase(package, version):
+        #   print("successful purchase")
+        #time.sleep(1)
+        #if self.fetch(package, version):
+        #   print('Downloaded version', version)
+
+        time.sleep(1)
+        relatedapps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)
+        for app in relatedapps.child:
+            if app.docid not in visitedpackages and self.iter < ITERMAX:
+                self.iter += 1
+                time.sleep(2)
+                visitedpackages += [app.docid]
+                self.crawl(app.docid, visitedpackages)
+
+
 
 def main(argv):
     # parse arguments
@@ -459,24 +509,8 @@ def main(argv):
             print('AndroidID', apk.androidid)
 
         time.sleep(1)
-        details = apk.details(package)
-        version = version or details.details.appDetails.versionCode
-        time.sleep(1)
-        reviews = apk.reviews(package)
+        apk.crawl(package)
 
-        if not os.path.exists(DOWNLOAD_FOLDER_PATH + package):
-            os.mkdir(DOWNLOAD_FOLDER_PATH + package)
-
-        apk.store(details, reviews)
-
-        # TODO maybe you can browse by putting the related in link front of android.user.google
-
-        time.sleep(1)
-        if apk.purchase(package, version):
-            print("successful purchase")
-        time.sleep(1)
-        if apk.fetch(package, version):
-            print('Downloaded version', version)
 
     except Exception as e:
         print('Error:', str(e))

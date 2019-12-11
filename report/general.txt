@@ -68,3 +68,6 @@ I managed to get the formatting correct. There is one problem though. an app can
 login info
 email: playstorecrawler00@gmail.com
 ww: IAmAGooglePlayCrawler
+
+paramaters
+--user playstorecrawler00@gmail.com --passwd IAmAGooglePlayCrawler --androidid 3fe994589ed3f83d --package com.spotify.music
