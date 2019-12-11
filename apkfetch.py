@@ -11,7 +11,7 @@ import apkfetch_pb2
 
 from util import encrypt
 
-ITERMAX = 5
+ITERMAX = 50
 
 DOWNLOAD_FOLDER_PATH = 'apps/'
 
@@ -454,12 +454,12 @@ class APKfetch(object):
 
         self.store(details, reviews)
 
-        #time.sleep(1)
-        #if self.purchase(package, version):
-        #   print("successful purchase")
-        #time.sleep(1)
-        #if self.fetch(package, version):
-        #   print('Downloaded version', version)
+        time.sleep(1)
+        if self.purchase(package, version):
+           print("successful purchase")
+        time.sleep(1)
+        if self.fetch(package, version):
+           print('Downloaded version', version)
 
         time.sleep(1)
         relatedapps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)

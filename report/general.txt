@@ -64,6 +64,7 @@ Ive got a list of permissions from you, but as you said, this includes actions a
 
 I managed to get the formatting correct. There is one problem though. an app can have external permissions (not of the android.permission package but from their own package or a package like com.samsung.android.app.spage.permission or com.spotify.music.permission). ofcourse we wont be able to include ALL permissions like that into one file. so is this approach a good idea?
 
+apps that went wrong com.kodarkooperativet.blackplayerex
 
 login info
 email: playstorecrawler00@gmail.com
