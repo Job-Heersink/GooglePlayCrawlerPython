@@ -33,45 +33,6 @@ LOGIN_USER_AGENT = 'GoogleLoginService/1.3 (gts3llte)'
 MARKET_USER_AGENT = 'Android-Finsky/5.7.10 (api=3,versionCode=80371000,sdk=24,device=falcon_umts,hardware=qcom,product=falcon_reteu,platformVersionRelease=4.4.4,model=XT1032,buildId=KXB21.14-L1.40,isWideScreen=0)'
 CHECKIN_USER_AGENT = 'Android-Checkin/2.0 (gts3llte)'
 DOWNLOAD_USER_AGENT = 'AndroidDownloadManager/9 (Linux; U; Android 9; XT1032 Build/KXB21.14-L1.40)'
-DEVICE = {
-    "name": "[my samsung A70]",
-    "UserReadableName": "Samsung Galaxy Tab S3 (api24)",  #
-    "Build.HARDWARE": "qcom",  #
-    "Build.RADIO": "T825XXU1AQK3",  #
-    "Build.BOOTLOADER": "T825XXU1ARA2",  #
-    "Build.FINGERPRINT": "samsung/a70qeea/a70q:9/PpR1.180610.011/A705FNXXU3ASI2:user/release-keys",
-    "Build.BRAND": "samsung",  #
-    "Build.DEVICE": "gts3llte",  #
-    "Build.VERSION.SDK_INT": 24,  #
-    "Build.MODEL": "SM-A705FN",
-    "Build.MANUFACTURER": "samsung",
-    "Build.PRODUCT": "a70qeea",
-    "Build.ID": "NRD90M",  #
-    "Build.VERSION.RELEASE": 7.0,  #
-    "TouchScreen": 3,  #
-    "Keyboard": 1,  #
-    "Navigation": 1,  #
-    "ScreenLayout": 4,  #
-    "HasHardKeyboard": False,  #
-    "HasFiveWayNavigation": False,  #
-    "GL.Version": 196610,  #
-    "Screen.Density": 320,  #
-    "Screen.Width": 1536,  #
-    "Screen.Height": 2048,  #
-    "Platforms": "arm64-v8a,armeabi-v7a,armeabi",  #
-    "SharedLibraries": "SemAudioThumbnail,SmpsManager,allshare,android.ext.services,android.ext.shared,android.test.runner,com.android.future.usb.accessory,com.android.location.provider,com.android.media.remotedisplay,com.android.mediadrm.signer,com.dsi.ant.antradio_library,com.google.android.gms,com.google.android.maps,com.google.android.media.effects,com.qti.ims.connectionmanager.imscmlibrary,com.qti.location.sdk,com.qti.snapdragon.sdk.display,com.qti.vzw.ims.internal,com.quicinc.wbc,com.quicinc.wbcservice,com.samsung.android.knox.knoxsdk,com.samsung.bbc,com.samsung.device,com.sec.android.app.minimode,com.sec.android.app.multiwindow,com.sec.android.mdm,com.sec.android.mdm.gearpolicymanager,com.sec.android.visualeffect,com.sec.dcm,com.sec.esecomm,com.sec.smartcard.auth,com.suntek.mway.rcs.client.aidl,com.suntek.mway.rcs.client.api,imsmanager,izat.xt.srv,javax.obex,libvtmanagerjar,org.apache.http.legacy,org.simalliance.openmobileapi,saiv,scamera_sdk_util,scrollpause,sec_feature,sec_platform_library,seccamera,sechardware,secimaging,seclvbmanager,secmediarecorder,secvision,semcamera,semextendedformat,simageis,smatlib,stayrotation,sws,touchwiz,videoeditor_sdk",
-    "Features": "android.hardware.audio.output,android.hardware.bluetooth,android.hardware.bluetooth_le,android.hardware.camera,android.hardware.camera.any,android.hardware.camera.autofocus,android.hardware.camera.capability.manual_post_processing,android.hardware.camera.capability.manual_sensor,android.hardware.camera.capability.raw,android.hardware.camera.flash,android.hardware.camera.front,android.hardware.camera.level.full,android.hardware.faketouch,android.hardware.fingerprint,android.hardware.location,android.hardware.location.gps,android.hardware.location.network,android.hardware.microphone,android.hardware.opengles.aep,android.hardware.screen.landscape,android.hardware.screen.portrait,android.hardware.sensor.accelerometer,android.hardware.sensor.compass,android.hardware.sensor.gyroscope,android.hardware.sensor.light,android.hardware.sensor.stepcounter,android.hardware.sensor.stepdetector,android.hardware.telephony,android.hardware.telephony.gsm,android.hardware.touchscreen,android.hardware.touchscreen.multitouch,android.hardware.touchscreen.multitouch.distinct,android.hardware.touchscreen.multitouch.jazzhand,android.hardware.usb.accessory,android.hardware.usb.host,android.hardware.vulkan.level,android.hardware.vulkan.version,android.hardware.wifi,android.hardware.wifi.direct,android.software.app_widgets,android.software.backup,android.software.connectionservice,android.software.device_admin,android.software.freeform_window_management,android.software.home_screen,android.software.input_methods,android.software.live_wallpaper,android.software.managed_users,android.software.midi,android.software.print,android.software.sip,android.software.sip.voip,android.software.verified_boot,android.software.voice_recognizers,android.software.vr.mode,android.software.webview,com.samsung.android.api.version.2402,com.samsung.android.authfw,com.samsung.android.knox.knoxsdk,com.samsung.android.sdk.camera.processor,com.samsung.android.sdk.camera.processor.dof,com.samsung.android.sdk.camera.processor.effect,com.samsung.android.sdk.camera.processor.gif,com.samsung.android.sdk.camera.processor.haze,com.samsung.android.sdk.camera.processor.hdr,com.samsung.android.sdk.camera.processor.lls,com.samsung.android.sdk.camera.processor.panorama,com.samsung.feature.device_category_tablet,com.samsung.feature.hdr_capable,com.samsung.feature.samsung_experience_mobile,com.samsung.feature.virtualscreen,com.sec.android.mdm,com.sec.android.secimaging,com.sec.android.smartface.smart_stay,com.sec.feature.barcode_emulator,com.sec.feature.cover,com.sec.feature.cover.flip,com.sec.feature.findo,com.sec.feature.fingerprint_manager_service,com.sec.feature.hovering_ui,com.sec.feature.motionrecognition_service,com.sec.feature.nsflp,com.sec.feature.overlaymagnifier,com.sec.feature.sensorhub,com.sec.feature.slocation,com.sec.feature.spen_usp",
-    "Locales": "ar,ar_AE,ar_IL,as,as_IN,ast,az,az_AZ,be,be_BY,bg,bg_BG,bn,bn_BD,bn_IN,bs,bs_BA,ca,ca_ES,cs,cs_CZ,da,da_DK,de,de_AT,de_CH,de_DE,el,el_GR,en,en_AU,en_CA,en_GB,en_IE,en_NZ,en_PH,en_US,en_ZA,en_ZG,es,es_ES,es_US,et,et_EE,eu,eu_ES,fa,fa_IR,fi,fi_FI,fil,fil_PH,fr,fr_BE,fr_CA,fr_CH,fr_FR,ga,ga_IE,gl,gl_ES,gu,gu_IN,hi,hi_IN,hr,hr_HR,hu,hu_HU,hy,hy_AM,in,in_ID,is,is_IS,it,it_IT,iw,iw_IL,ja,ja_JP,ka,ka_GE,kk,kk_KZ,km,km_KH,kn,kn_IN,ko,ko_KR,ky,ky_KG,lo,lo_LA,lt,lt_LT,lv,lv_LV,mk,mk_MK,ml,ml_IN,mn,mn_MN,mr,mr_IN,ms,ms_MY,my,my_MM,my_ZG,nb,nb_NO,ne,ne_NP,nl,nl_BE,nl_NL,or,or_IN,pa,pa_IN,pl,pl_PL,pl_SP,pt,pt_BR,pt_PT,ro,ro_RO,ru,ru_RU,si,si_LK,sk,sk_SK,sl,sl_SI,sq,sq_AL,sr,sr_Latn,sr_RS,sv,sv_SE,ta,ta_IN,te,te_IN,tg,tg_TJ,th,th_TH,tk,tk_TM,tr,tr_TR,uk,uk_UA,ur,ur_PK,uz,uz_UZ,vi,vi_VN,zh,zh_CN,zh_HK,zh_TW",
-    "GSF.version": 12521022,  #
-    "Vending.version": 80951000,  #
-    "Vending.versionString": "9.5.10-all [0] [PR] 192200278",  #
-    "CellOperator": "26203",  #
-    "SimOperator": "Youfone",  #
-    "Roaming": "mobile-notroaming",  #
-    "Client": "android-google",  #
-    "TimeZone": "Europe/Berlin",  #
-    "GL.Extensions": "GL_AMD_compressed_ATC_texture,GL_AMD_performance_monitor,GL_ANDROID_extension_pack_es31a,GL_APPLE_texture_2D_limited_npot,GL_ARB_vertex_buffer_object,GL_ARM_shader_framebuffer_fetch_depth_stencil,GL_EXT_YUV_target,GL_EXT_blit_framebuffer_params,GL_EXT_buffer_storage,GL_EXT_clip_cull_distance,GL_EXT_color_buffer_float,GL_EXT_color_buffer_half_float,GL_EXT_copy_image,GL_EXT_debug_label,GL_EXT_debug_marker,GL_EXT_discard_framebuffer,GL_EXT_disjoint_timer_query,GL_EXT_draw_buffers_indexed,GL_EXT_geometry_shader,GL_EXT_gpu_shader5,GL_EXT_multisampled_render_to_texture,GL_EXT_primitive_bounding_box,GL_EXT_protected_textures,GL_EXT_robustness,GL_EXT_sRGB,GL_EXT_sRGB_write_control,GL_EXT_shader_framebuffer_fetch,GL_EXT_shader_io_blocks,GL_EXT_shader_non_constant_global_initializers,GL_EXT_tessellation_shader,GL_EXT_texture_border_clamp,GL_EXT_texture_buffer,GL_EXT_texture_cube_map_array,GL_EXT_texture_filter_anisotropic,GL_EXT_texture_format_BGRA8888,GL_EXT_texture_norm16,GL_EXT_texture_sRGB_R8,GL_EXT_texture_sRGB_decode,GL_EXT_texture_type_2_10_10_10_REV,GL_KHR_blend_equation_advanced,GL_KHR_blend_equation_advanced_coherent,GL_KHR_debug,GL_KHR_no_error,GL_KHR_texture_compression_astc_hdr,GL_KHR_texture_compression_astc_ldr,GL_OES_EGL_image,GL_OES_EGL_image_external,GL_OES_EGL_image_external_essl3,GL_OES_EGL_sync,GL_OES_blend_equation_separate,GL_OES_blend_func_separate,GL_OES_blend_subtract,GL_OES_compressed_ETC1_RGB8_texture,GL_OES_compressed_paletted_texture,GL_OES_depth24,GL_OES_depth_texture,GL_OES_depth_texture_cube_map,GL_OES_draw_texture,GL_OES_element_index_uint,GL_OES_framebuffer_object,GL_OES_get_program_binary,GL_OES_matrix_palette,GL_OES_packed_depth_stencil,GL_OES_point_size_array,GL_OES_point_sprite,GL_OES_read_format,GL_OES_rgb8_rgba8,GL_OES_sample_shading,GL_OES_sample_variables,GL_OES_shader_image_atomic,GL_OES_shader_multisample_interpolation,GL_OES_standard_derivatives,GL_OES_stencil_wrap,GL_OES_surfaceless_context,GL_OES_texture_3D,GL_OES_texture_compression_astc,GL_OES_texture_cube_map,GL_OES_texture_env_crossbar,GL_OES_texture_float,GL_OES_texture_float_linear,GL_OES_texture_half_float,GL_OES_texture_half_float_linear,GL_OES_texture_mirrored_repeat,GL_OES_texture_npot,GL_OES_texture_stencil8,GL_OES_texture_storage_multisample_2d_array,GL_OES_vertex_array_object,GL_OES_vertex_half_float,GL_OVR_multiview,GL_OVR_multiview2,GL_OVR_multiview_multisampled_render_to_texture,GL_QCOM_alpha_test,GL_QCOM_extended_get,GL_QCOM_tiled_rendering"
-}
 
 
 def num_to_hex(num):
@@ -85,9 +46,16 @@ class APKfetch(object):
     def __init__(self):
         self.session = requests.Session()
         self.user = self.passwd = self.androidid = self.token = self.auth = None
-        self.iter = 0;
+        self.iter = 0
 
     def request_service(self, service, app, user_agent=LOGIN_USER_AGENT):
+        """
+        requesting a login service from google
+        @service: the service to request, like ac2dm
+        @app: the app to request to
+        @user_agent: the user agent
+        """
+
         self.session.headers.update({'User-Agent': user_agent,
                                      'Content-Type': 'application/x-www-form-urlencoded'})
 
@@ -122,92 +90,33 @@ class APKfetch(object):
 
         return response_values.get('Token', None), response_values.get('Auth')
 
-    def checkin(self):
-        headers = {'User-Agent': CHECKIN_USER_AGENT,
-                   'Content-Type': 'application/x-protobuf'}
-
-        cr = apkfetch_pb2.AndroidCheckinRequest()
-
-        cr.id = 0
-        cr.marketCheckin = self.user
-        cr.accountCookie.append(self.auth[5:])
-        cr.deviceConfiguration.touchScreen = DEVICE["TouchScreen"]
-        cr.deviceConfiguration.keyboard = DEVICE["Keyboard"]
-        cr.deviceConfiguration.navigation = DEVICE["Navigation"]
-        cr.deviceConfiguration.screenLayout = DEVICE["ScreenLayout"]
-        cr.deviceConfiguration.hasHardKeyboard = DEVICE["HasHardKeyboard"]
-        cr.deviceConfiguration.hasFiveWayNavigation = DEVICE["HasFiveWayNavigation"]
-        cr.deviceConfiguration.screenDensity = DEVICE["Screen.Density"]
-        cr.deviceConfiguration.screenWidth = DEVICE["Screen.Width"]
-        cr.deviceConfiguration.screenHeight = DEVICE["Screen.Height"]
-        cr.deviceConfiguration.glEsVersion = DEVICE["GSF.version"]
-
-        libList = DEVICE["SharedLibraries"].split(",")
-        featureList = DEVICE["Features"].split(",")
-        localeList = DEVICE["Locales"].split(",")
-        glList = DEVICE["GL.Extensions"].split(",")
-        platforms = DEVICE["Platforms"].split(",")
-
-        for x in platforms:
-            cr.deviceConfiguration.nativePlatform.append(x)
-        for x in libList:
-            cr.deviceConfiguration.systemSharedLibrary.append(x)
-        for x in featureList:
-            cr.deviceConfiguration.systemAvailableFeature.append(x)
-        for x in localeList:
-            cr.deviceConfiguration.systemSupportedLocale.append(x)
-        for x in glList:
-            cr.deviceConfiguration.glExtension.append(x)
-        cr.version = 3
-        cr.fragment = 0
-
-        cr.checkin.build.id = DEVICE["Build.FINGERPRINT"]
-        cr.checkin.build.product = DEVICE["Build.HARDWARE"]
-        cr.checkin.build.carrier = DEVICE["Build.BRAND"]
-        cr.checkin.build.radio = DEVICE["Build.RADIO"]
-        cr.checkin.build.bootloader = DEVICE["Build.BOOTLOADER"]
-        cr.checkin.build.device = DEVICE["Build.DEVICE"]
-        cr.checkin.build.sdkVersion = DEVICE["Build.VERSION.SDK_INT"]
-        cr.checkin.build.model = DEVICE["Build.MODEL"]
-        cr.checkin.build.manufacturer = DEVICE["Build.MANUFACTURER"]
-        cr.checkin.build.buildProduct = DEVICE["Build.PRODUCT"]
-        cr.checkin.build.client = DEVICE["Client"]
-        cr.checkin.build.otaInstalled = False
-        cr.checkin.build.timestamp = int(time.time())
-        cr.checkin.build.googleServices = DEVICE["GSF.version"]
-        cr.checkin.lastCheckinMsec = 0
-        cr.checkin.cellOperator = DEVICE["CellOperator"]
-        cr.checkin.simOperator = DEVICE["SimOperator"]
-        cr.checkin.roaming = DEVICE["Roaming"]
-        cr.checkin.userNumber = 0
-
-        response = self.session.post(GOOGLE_CHECKIN_URL, data=cr.SerializeToString(), headers=headers,
-                                     allow_redirects=True)
-
-        checkin_response = apkfetch_pb2.AndroidCheckinResponse()
-        checkin_response.ParseFromString(response.content)
-        token = num_to_hex(checkin_response.securityToken)
-        androidid = num_to_hex(checkin_response.androidId)
-        return token, androidid
-
     def login(self, user, passwd, androidid=None):
+        """
+        login using googles as2dm authentication system
+        @user: email
+        @passwd: password
+        @androidid: android id
+        """
+
         self.user = user
         self.passwd = passwd
         self.androidid = androidid
 
         self.token, self.auth = self.request_service('ac2dm', 'com.google.android.gsf')
 
-        logging.info('token: '+ self.token)
-
-        if not androidid:
-            _, self.androidid = self.checkin()
+        logging.info('token: ' + self.token)
 
         _, self.auth = self.request_service('androidmarket', 'com.android.vending', MARKET_USER_AGENT)
-        logging.info('auth: '+ self.auth)
+        logging.info('auth: ' + self.auth)
 
         return self.auth is not None
 
     def details(self, package_name):
+        """
+        performs a GET request to get the details of a specific app
+        @package_name: the app to get details from
+        """
+
         headers = {'X-DFE-Device-Id': self.androidid,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
@@ -230,6 +139,12 @@ class APKfetch(object):
         return details
 
     def reviews(self, package_name, amount=50):
+        """
+        performs a GET request to get the reviews of a specific app
+        @package_name: the app to get reviews from
+        @amount: amount of reviews to get
+        """
+
         headers = {'X-DFE-Device-Id': self.androidid,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
@@ -252,6 +167,12 @@ class APKfetch(object):
         return review_response.payload.reviewResponse.getResponse
 
     def get_download_url(self, package_name, version_code):
+        """
+        performs a GET request to get the download url of a specific app
+        @package_name: the app to get the download url from
+        @version_code: the version of the app to download
+        """
+
         headers = {'X-DFE-Device-Id': self.androidid,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
@@ -276,43 +197,19 @@ class APKfetch(object):
                 'error getting download url: ' + delivery_response.commands.displayErrorMessage + " for: " + package_name)
         return delivery_response.payload.deliveryResponse.appDeliveryData.downloadUrl
 
-    def purchase(self, package_name, versioncode, expansion_files=False):
+    def purchase(self, package_name, version_code):
+        """
+        performs a GET request to get the download token of a specific app and complete the purchase
+        @package_name: the app to get the download token from
+        @version_code: the version of the app to get the download token from
+        """
 
-        if versioncode is None:
+        if version_code is None:
             raise RuntimeError('no version code for purchase')
 
-        headers = {'X-DFE-Device-Id': self.androidid,
-                   'X-DFE-Client-Id': 'am-android-google',
-                   'Accept-Encoding': '',
-                   'Host': 'android.clients.google.com',
-                   'Authorization': 'GoogleLogin Auth=' + self.auth,
-                   'Content-Typ': 'application/x-www-form-urlencoded; charset=UTF-8'}
-
-        useragent = ("Android-Finsky/{versionString} ("
-                     "api=3"
-                     ",versionCode={versionCode}"
-                     ",sdk={sdk}"
-                     ",device={device}"
-                     ",hardware={hardware}"
-                     ",product={product}"
-                     ",platformVersionRelease={platform_v}"
-                     ",model={model}"
-                     ",buildId={build_id}"
-                     ",isWideScreen=0"
-                     ",supportedAbis={supported_abis}"
-                     ")").format(versionString=DEVICE["Vending.versionString"],
-                                 versionCode=DEVICE["Vending.version"],
-                                 sdk=DEVICE["Build.VERSION.SDK_INT"],
-                                 device=DEVICE["Build.DEVICE"],
-                                 hardware=DEVICE["Build.HARDWARE"],
-                                 product=DEVICE["Build.PRODUCT"],
-                                 platform_v=DEVICE["Build.VERSION.RELEASE"],
-                                 model=DEVICE["Build.MODEL"],
-                                 build_id=DEVICE["Build.ID"],
-                                 supported_abis=DEVICE["Platforms"].replace(',', ';'))
         headers = {
             "X-DFE-Encoded-Targets": "CAEScFfqlIEG6gUYogFWrAISK1WDAg+hAZoCDgIU1gYEOIACFkLMAeQBnASLATlASUuyAyqCAjY5igOMBQzfA/IClwFbApUC4ANbtgKVAS7OAX8YswHFBhgDwAOPAmGEBt4OfKkB5weSB5AFASkiN68akgMaxAMSAQEBA9kBO7UBFE1KVwIDBGs3go6BBgEBAgMECQgJAQIEAQMEAQMBBQEBBAUEFQYCBgUEAwMBDwIBAgOrARwBEwMEAg0mrwESfTEcAQEKG4EBMxghChMBDwYGASI3hAEODEwXCVh/EREZA4sBYwEdFAgIIwkQcGQRDzQ2fTC2AjfVAQIBAYoBGRg2FhYFBwEqNzACJShzFFblAo0CFxpFNBzaAd0DHjIRI4sBJZcBPdwBCQGhAUd2A7kBLBVPngEECHl0UEUMtQETigHMAgUFCc0BBUUlTywdHDgBiAJ+vgKhAU0uAcYCAWQ/5ALUAw1UwQHUBpIBCdQDhgL4AY4CBQICjARbGFBGWzA1CAEMOQH+BRAOCAZywAIDyQZ2MgM3BxsoAgUEBwcHFia3AgcGTBwHBYwBAlcBggFxSGgIrAEEBw4QEqUCASsWadsHCgUCBQMD7QICA3tXCUw7ugJZAwGyAUwpIwM5AwkDBQMJA5sBCw8BNxBVVBwVKhebARkBAwsQEAgEAhESAgQJEBCZATMdzgEBBwG8AQQYKSMUkAEDAwY/CTs4/wEaAUt1AwEDAQUBAgIEAwYEDx1dB2wGeBFgTQ",
-            "User-Agent": useragent,
+            "User-Agent": MARKET_USER_AGENT,
             'X-DFE-Device-Id': self.androidid,
             "X-DFE-Client-Id": "am-android-google",
             'Host': 'android.clients.google.com',
@@ -327,7 +224,7 @@ class APKfetch(object):
 
         params = {'ot': 1,
                   'doc': package_name,
-                  'vc': versioncode}
+                  'vc': version_code}
 
         response = requests.post(GOOGLE_PURCHASE_URL, headers=headers,
                                  params=params, verify=True,
@@ -342,6 +239,13 @@ class APKfetch(object):
             return downloadtoken
 
     def fetch(self, package_name, version_code, apk_fn=None):
+        """
+        download the app, by getting a download url.
+        @package_name: the app to download
+        @version_code: the version of the app to download
+        @apk_fn: predefined name, package_name by default
+        """
+
         url = self.get_download_url(package_name, version_code)
         if not url:
             return 0
@@ -364,6 +268,11 @@ class APKfetch(object):
         return os.path.exists(apk_fn)
 
     def getrelated(self, browsestream):
+        """
+        get the list of apps under the "more you might like" section under app details
+        @browsestream: the link from the app details to request the list of related apps
+        """
+
         headers = {'X-DFE-Device-Id': self.androidid,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
@@ -385,6 +294,10 @@ class APKfetch(object):
         return related_response.preFetch[0].response.payload.listResponse.doc[0]
 
     def loadvisitedapps(self):
+        """
+        load all apps previously visited from the appinfo.csv file
+        """
+
         with open("apps/appinfo.csv", "r") as csvfile:
             file = csv.reader(csvfile, delimiter=',', quotechar='"')
             visitedapps = []
@@ -397,7 +310,13 @@ class APKfetch(object):
         visitedapps.pop(0)
         return visitedapps
 
-    def store(self, details, reviews=None):
+    def store(self, details, reviews):
+        """
+        store the details and reviews of an app into a .csv file
+        @details: the list of details of a specific app
+        @reviews: the list of reviews from a specific app
+        """
+
         with open("apps/appinfo.csv", "a") as csvfile:
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file.writerow([details.docid, details.backendDocid, details.title, details.descriptionHtml,
@@ -419,9 +338,6 @@ class APKfetch(object):
                            details.details.appDetails.recentChangesHtml, "!!!",
                            details.details.appDetails.installationSize, details.details.appDetails.unstable,
                            details.details.appDetails.hasInstantLink, details.details.appDetails.containsAds])
-
-            # TODO implement category info
-
             csvfile.close()
 
         with open("apps/permissions.csv", "a") as csvfile:
@@ -469,13 +385,19 @@ class APKfetch(object):
 
             csvfile.close()
 
-    def crawl(self, package, visitedpackages=[]):
-        logging.info("started crawling through " + package + " on iteration: {}".format(self.iter))
-        print("started crawling through " + package + " on iteration: {}".format(self.iter))
-        details = self.details(package)
+    def crawl(self, package_name, visitedpackages=[]):
+        """
+        crawls throught the google play store, provided with a starting package
+        @package_name: the package to start from
+        @visitedpackages: a list of packages already visited
+        """
+
+        logging.info("started crawling through " + package_name + " on iteration: {}".format(self.iter))
+        print("started crawling through " + package_name + " on iteration: {}".format(self.iter))
+        details = self.details(package_name)
         version = details.details.appDetails.versionCode
         time.sleep(1)
-        reviews = self.reviews(package)
+        reviews = self.reviews(package_name)
 
         # TODO can even get more related links like similar apps, more from spotify etc
 
@@ -483,10 +405,10 @@ class APKfetch(object):
 
         if details.offer[0].micros == 0:
             time.sleep(1)
-            if self.purchase(package, version):
+            if self.purchase(package_name, version):
                 logging.info("successful purchase")
                 time.sleep(1)
-            if self.fetch(package, version):
+            if self.fetch(package_name, version):
                 logging.info('Downloaded version {}'.format(version))
         else:
             logging.warning("This app needs to be paid for in order to download")
@@ -512,10 +434,9 @@ def main(argv):
     parser.add_argument('--androidid', '-a', help='AndroidID')
     parser.add_argument('--package', '-k', help='Package name of the app')
     parser.add_argument('--version', '-v', help='Download a specific version of the app')
-    parser.add_argument('--search', '-s', help='Find all versions of the app that are available', action='store_true')
 
-    #prepare logging file
-    logging.basicConfig(filename=datetime.now().strftime("%Y%m%d_%H%M%S")+'.log', level=logging.INFO)
+    # prepare logging file
+    logging.basicConfig(filename=datetime.now().strftime("%Y%m%d_%H%M%S") + '.log', level=logging.INFO)
 
     try:
         # assign parsed values
@@ -527,11 +448,12 @@ def main(argv):
         package = args.package
         version = args.version
 
-        if not user or not passwd or not package:
+        if not user or not passwd or not package or not androidid:
             parser.print_usage()
-            raise ValueError('user, passwd, and package are required options')
+            raise ValueError('user, passwd, androidid and package are required options. android ID can be found using '
+                             'Device id (playstore) on your android device')
 
-        # create class
+            # create class
         apk = APKfetch()
 
         print("crawling through the playstore")
@@ -544,8 +466,9 @@ def main(argv):
 
         time.sleep(1)
 
-        apk.crawl(package, apk.loadvisitedapps())
-        # print(apk.loadvisitedapps())
+        visitedapps = apk.loadvisitedapps()
+        if package not in visitedapps:
+            apk.crawl(package, visitedapps)
 
         print("finished crawling")
 
