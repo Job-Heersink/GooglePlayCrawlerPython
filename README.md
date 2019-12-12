@@ -1,4 +1,4 @@
-# GooglePLayCrawlerPython
+# GooglePlayCrawlerPython
 this project is based on https://github.com/egbertbouman/APKfetch
 
 
