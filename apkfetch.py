@@ -4,20 +4,24 @@ import os
 import sys
 import time
 import argparse
+from datetime import datetime
+
 import requests
 import csv
+import logging
 
 import apkfetch_pb2
 
 from util import encrypt
 
-ITERMAX = 50
+ITERMAX = 500
 
 DOWNLOAD_FOLDER_PATH = 'apps/'
 
 GOOGLE_LOGIN_URL = 'https://android.clients.google.com/auth'
 GOOGLE_CHECKIN_URL = 'https://android.clients.google.com/checkin'
 GOOGLE_DETAILS_URL = 'https://android.clients.google.com/fdfe/details'
+GOOGLE_BULKDETAILS_URL = 'https://android.clients.google.com/fdfe/bulkDetails'
 GOOGLE_DELIVERY_URL = 'https://android.clients.google.com/fdfe/delivery'
 GOOGLE_PURCHASE_URL = 'https://android.clients.google.com/fdfe/purchase'
 GOOGLE_BROWSE_URL = 'https://android.clients.google.com/fdfe/browse'
@@ -105,7 +109,6 @@ class APKfetch(object):
         data['EncryptedPasswd'] = self.token or encrypt(self.user, self.passwd)
 
         response = self.session.post(GOOGLE_LOGIN_URL, data=data, allow_redirects=True)
-        # print(response.text)
         response_values = dict([line.split('=', 1) for line in response.text.splitlines()])
 
         if 'Error' in response_values:
@@ -194,17 +197,15 @@ class APKfetch(object):
 
         self.token, self.auth = self.request_service('ac2dm', 'com.google.android.gsf')
 
-        print('token: ', self.token)
+        logging.info('token: '+ self.token)
 
         if not androidid:
             _, self.androidid = self.checkin()
 
         _, self.auth = self.request_service('androidmarket', 'com.android.vending', MARKET_USER_AGENT)
-        print('auth: ', self.auth)
+        logging.info('auth: '+ self.auth)
 
         return self.auth is not None
-
-    #todo: implement bulk details
 
     def details(self, package_name):
         headers = {'X-DFE-Device-Id': self.androidid,
@@ -219,10 +220,13 @@ class APKfetch(object):
 
         details_response = apkfetch_pb2.ResponseWrapper()
         details_response.ParseFromString(response.content)
-        #print(details_response.payload.detailsResponse.docV2)
+        # print(details_response.payload.detailsResponse.docV2)
         details = details_response.payload.detailsResponse.docV2
         if not details:
-            raise RuntimeError('Could not get details')
+            logging.error('Could not get details for: ' + package_name)
+        if details_response.commands.displayErrorMessage != "":
+            logging.error(
+                'error getting details: ' + details_response.commands.displayErrorMessage + " for: " + package_name)
         return details
 
     def reviews(self, package_name, amount=50):
@@ -241,9 +245,10 @@ class APKfetch(object):
         review_response.ParseFromString(response.content)
 
         if not review_response:
-            raise RuntimeError('Could not get reviews')
+            logging.error('Could not get reviews for: ' + package_name)
         if review_response.commands.displayErrorMessage != "":
-            raise RuntimeError('error getting reviews: ' + review_response.commands.displayErrorMessage)
+            logging.error(
+                'error getting reviews: ' + review_response.commands.displayErrorMessage + " for: " + package_name)
         return review_response.payload.reviewResponse.getResponse
 
     def get_download_url(self, package_name, version_code):
@@ -264,12 +269,16 @@ class APKfetch(object):
         delivery_response = apkfetch_pb2.ResponseWrapper()
         delivery_response.ParseFromString(response.content)
 
-        url = delivery_response.payload.deliveryResponse.appDeliveryData.downloadUrl
-        return url
+        if not delivery_response:
+            logging.error('Could not get download url for: ' + package_name)
+        if delivery_response.commands.displayErrorMessage != "":
+            logging.error(
+                'error getting download url: ' + delivery_response.commands.displayErrorMessage + " for: " + package_name)
+        return delivery_response.payload.deliveryResponse.appDeliveryData.downloadUrl
 
-    def purchase(self, packageName, versionCode, expansion_files=False):
+    def purchase(self, package_name, versioncode, expansion_files=False):
 
-        if versionCode is None:
+        if versioncode is None:
             raise RuntimeError('no version code for purchase')
 
         headers = {'X-DFE-Device-Id': self.androidid,
@@ -317,8 +326,8 @@ class APKfetch(object):
         }
 
         params = {'ot': 1,
-                  'doc': packageName,
-                  'vc': versionCode}
+                  'doc': package_name,
+                  'vc': versioncode}
 
         response = requests.post(GOOGLE_PURCHASE_URL, headers=headers,
                                  params=params, verify=True,
@@ -326,7 +335,8 @@ class APKfetch(object):
 
         response = apkfetch_pb2.ResponseWrapper.FromString(response.content)
         if response.commands.displayErrorMessage != "":
-            raise RuntimeError('error performing purchase: ' + response.commands.displayErrorMessage)
+            logging.error(
+                'error performing purchase: ' + response.commands.displayErrorMessage + " for: " + package_name)
         else:
             downloadtoken = response.payload.buyResponse.downloadToken
             return downloadtoken
@@ -334,12 +344,12 @@ class APKfetch(object):
     def fetch(self, package_name, version_code, apk_fn=None):
         url = self.get_download_url(package_name, version_code)
         if not url:
-            raise RuntimeError('Could not get download URL')
+            return 0
 
         response = self.session.get(url, headers={'User-Agent': DOWNLOAD_USER_AGENT},
                                     stream=True, allow_redirects=True)
 
-        print("downloading...")
+        logging.info("downloading...")
         apk_fn = apk_fn or (DOWNLOAD_FOLDER_PATH + package_name + '.apk')
         if os.path.exists(apk_fn):
             os.remove(apk_fn)
@@ -353,7 +363,7 @@ class APKfetch(object):
 
         return os.path.exists(apk_fn)
 
-    def getrelated(self,browsestream):
+    def getrelated(self, browsestream):
         headers = {'X-DFE-Device-Id': self.androidid,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
@@ -361,15 +371,31 @@ class APKfetch(object):
                    'Authorization': 'GoogleLogin Auth=' + self.auth,
                    'User-Agent': MARKET_USER_AGENT}
 
-        response = self.session.get(GOOGLE_FDFE_URL+"/"+browsestream, params=None, headers=headers, allow_redirects=True)
+        response = self.session.get(GOOGLE_FDFE_URL + "/" + browsestream, params=None, headers=headers,
+                                    allow_redirects=True)
 
         related_response = apkfetch_pb2.ResponseWrapper()
         related_response.ParseFromString(response.content)
-        #print(related_response.preFetch[0].response.payload.listResponse.doc)
+        # print(related_response.preFetch[0].response.payload.listResponse.doc)
 
         if not related_response:
-            raise RuntimeError('Could not get related apps')
+            logging.error('Could not get related apps for')
+        if related_response.commands.displayErrorMessage != "":
+            logging.error('error getting related apps: ' + related_response.commands.displayErrorMessage)
         return related_response.preFetch[0].response.payload.listResponse.doc[0]
+
+    def loadvisitedapps(self):
+        with open("apps/appinfo.csv", "r") as csvfile:
+            file = csv.reader(csvfile, delimiter=',', quotechar='"')
+            visitedapps = []
+
+            for row in file:
+                visitedapps += [row[0]]
+
+            csvfile.close()
+
+        visitedapps.pop(0)
+        return visitedapps
 
     def store(self, details, reviews=None):
         with open("apps/appinfo.csv", "a") as csvfile:
@@ -444,7 +470,8 @@ class APKfetch(object):
             csvfile.close()
 
     def crawl(self, package, visitedpackages=[]):
-        print("started crawling through "+package+" on iteration: {}".format(self.iter))
+        logging.info("started crawling through " + package + " on iteration: {}".format(self.iter))
+        print("started crawling through " + package + " on iteration: {}".format(self.iter))
         details = self.details(package)
         version = details.details.appDetails.versionCode
         time.sleep(1)
@@ -454,22 +481,24 @@ class APKfetch(object):
 
         self.store(details, reviews)
 
-        time.sleep(1)
-        if self.purchase(package, version):
-           print("successful purchase")
-        time.sleep(1)
-        if self.fetch(package, version):
-           print('Downloaded version', version)
+        if details.offer[0].micros == 0:
+            time.sleep(1)
+            if self.purchase(package, version):
+                logging.info("successful purchase")
+                time.sleep(1)
+            if self.fetch(package, version):
+                logging.info('Downloaded version {}'.format(version))
+        else:
+            logging.warning("This app needs to be paid for in order to download")
 
         time.sleep(1)
         relatedapps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)
         for app in relatedapps.child:
             if app.docid not in visitedpackages and self.iter < ITERMAX:
                 self.iter += 1
-                time.sleep(2)
+                time.sleep(1)
                 visitedpackages += [app.docid]
                 self.crawl(app.docid, visitedpackages)
-
 
 
 def main(argv):
@@ -484,6 +513,9 @@ def main(argv):
     parser.add_argument('--package', '-k', help='Package name of the app')
     parser.add_argument('--version', '-v', help='Download a specific version of the app')
     parser.add_argument('--search', '-s', help='Find all versions of the app that are available', action='store_true')
+
+    #prepare logging file
+    logging.basicConfig(filename=datetime.now().strftime("%Y%m%d_%H%M%S")+'.log', level=logging.INFO)
 
     try:
         # assign parsed values
@@ -502,6 +534,8 @@ def main(argv):
         # create class
         apk = APKfetch()
 
+        print("crawling through the playstore")
+
         # login
         apk.login(user, passwd, androidid)
 
@@ -509,7 +543,11 @@ def main(argv):
             print('AndroidID', apk.androidid)
 
         time.sleep(1)
-        apk.crawl(package)
+
+        apk.crawl(package, apk.loadvisitedapps())
+        # print(apk.loadvisitedapps())
+
+        print("finished crawling")
 
 
     except Exception as e:
