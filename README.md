@@ -3,10 +3,11 @@ this project is based on https://github.com/egbertbouman/APKfetch
 
 
 ### Dependencies
-* Python 2.7+
+* Python 3.6+
 * requests
 * protobuf
 * PyCryptodome
+* lxml
 
 The Python packages can be installed with
 
@@ -22,18 +23,15 @@ from APKfetch.apkfetch import APKfetch
 
 def main():
   apk = APKfetch()
-  apk.login('you@gmail.com', 'yourpassword')
-  apk.fetch('com.somepackage')
+  apk.login('you@gmail.com', 'yourpassword', 'yourandroidid')
+  apk.crawl('com.somepackage')
 
 if __name__ == '__main__':
     main()
 ```
 
-Note that the example creates a new android id. If you wish to use an existing id, you should login using:
 
-```python
-apk.login('you@gmail.com', 'yourpassword', 'yourandroidid')
-```
+Note that you do need an androidid for this program to work, you can get an android id by installing Device ID on your android device.
 
 ### Using the CLI
 
