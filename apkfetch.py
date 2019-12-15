@@ -391,12 +391,11 @@ class APKfetch(object):
         @package_name: the package to start from
         @visitedpackages: a list of packages already visited
         """
-
+        time.sleep(1)
         logging.info("started crawling through " + package_name + " on iteration: {}".format(self.iter))
         print("started crawling through " + package_name + " on iteration: {}".format(self.iter))
         details = self.details(package_name)
         version = details.details.appDetails.versionCode
-        time.sleep(1)
         reviews = self.reviews(package_name)
 
         # TODO can even get more related links like similar apps, more from spotify etc
@@ -404,21 +403,17 @@ class APKfetch(object):
         self.store(details, reviews)
 
         if details.offer[0].micros == 0:
-            time.sleep(1)
             if self.purchase(package_name, version):
                 logging.info("successful purchase")
-                time.sleep(1)
             if self.fetch(package_name, version):
                 logging.info('Downloaded version {}'.format(version))
         else:
             logging.warning("This app needs to be paid for in order to download")
 
-        time.sleep(1)
         relatedapps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)
         for app in relatedapps.child:
             if app.docid not in visitedpackages and self.iter < ITERMAX:
                 self.iter += 1
-                time.sleep(1)
                 visitedpackages += [app.docid]
                 self.crawl(app.docid, visitedpackages)
 
@@ -436,7 +431,7 @@ def main(argv):
     parser.add_argument('--version', '-v', help='Download a specific version of the app')
 
     # prepare logging file
-    logging.basicConfig(filename=datetime.now().strftime("%Y%m%d_%H%M%S") + '.log', level=logging.INFO)
+    logging.basicConfig(filename=datetime.now().strftime("logs/%Y-%m-%d_%H:%M:%S.log"), level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
 
     try:
         # assign parsed values
@@ -446,7 +441,7 @@ def main(argv):
         passwd = args.passwd
         androidid = args.androidid
         package = args.package
-        version = args.version
+        #version = args.version
 
         if not user or not passwd or not package or not androidid:
             parser.print_usage()
