@@ -5,17 +5,15 @@ import sys
 import time
 import argparse
 from datetime import datetime
-
 import requests
 import csv
 import logging
-
 import apkfetch_pb2
-
 from util import encrypt
+import warnings
 
 ITERMAX = 500
-DOWNLOADAPPS = False
+DOWNLOADAPPS = True
 
 DOWNLOAD_FOLDER_PATH = 'apps/'
 
@@ -386,47 +384,65 @@ class APKfetch(object):
 
             csvfile.close()
 
-    def crawl(self, package_name, visitedpackages=[]):
+    def visitapp(self, package_name):
+        """
+        gets and stores the information and reviews of a specific package and downloads the apkfile
+        @package_name: the package to start from
+        """
+
+        logging.info("started crawling through " + package_name + " on iteration: {}".format(self.iter))
+        print("started crawling through " + package_name + " on iteration: {}".format(self.iter))
+        details = self.details(package_name)
+        version = details.details.appDetails.versionCode
+        reviews = self.reviews(package_name)
+
+        if not DOWNLOADAPPS:
+            logging.info("downloading is turned off")
+            time.sleep(5)
+        elif details.offer[0].micros > 0:
+            logging.warning("This app needs to be paid for in order to download")
+        else:
+            if self.purchase(package_name, version):
+                logging.info("successful purchase")
+            if self.fetch(package_name, version):
+                logging.info('Downloaded version {}'.format(version))
+
+        related_apps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)
+
+        # TODO can even get more related links like similar apps, more from spotify etc
+        self.store(details, reviews)
+
+        return related_apps.child
+
+    def crawl(self, package_name, visited_packages=[]):
         """
         crawls through the google play store, provided with a starting package
         @package_name: the package to start from
         @visitedpackages: a list of packages already visited
         """
+
         time.sleep(1)
 
         try:
-            logging.info("started crawling through " + package_name + " on iteration: {}".format(self.iter))
-            print("started crawling through " + package_name + " on iteration: {}".format(self.iter))
-            details = self.details(package_name)
-            version = details.details.appDetails.versionCode
-            reviews = self.reviews(package_name)
-
-            if not DOWNLOADAPPS:
-                logging.info("downloading is turned off")
-            elif details.offer[0].micros > 0:
-                logging.warning("This app needs to be paid for in order to download")
-            else:
-                if self.purchase(package_name, version):
-                    logging.info("successful purchase")
-                if self.fetch(package_name, version):
-                    logging.info('Downloaded version {}'.format(version))
-
-            relatedapps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)
-
-            # TODO can even get more related links like similar apps, more from spotify etc
-            self.store(details, reviews)
-
+            related_apps = self.visitapp(package_name)
         except Exception as e:
             print('Error:', str(e))
-            logging.error('error: '+str(e)+". moving on to the next app")
+            logging.error('error: ' + str(e) + ".\n Probably a server timeout. Waiting and trying again.")
             time.sleep(10)
-            return
 
-        for app in relatedapps.child:
-            if app.docid not in visitedpackages and self.iter < ITERMAX:
+            try:
+                related_apps = self.visitapp(package_name)
+            except Exception as e:
+                print('Error:', str(e))
+                logging.critical('critical error: ' + str(e) + ".\n Second try failed. Skipping this app and moving "
+                                                               "on to the next")
+                return
+
+        for app in related_apps:
+            if app.docid not in visited_packages and self.iter < ITERMAX:
                 self.iter += 1
-                visitedpackages += [app.docid]
-                self.crawl(app.docid, visitedpackages)
+                visited_packages += [app.docid]
+                self.crawl(app.docid, visited_packages)
 
 
 def main(argv):
