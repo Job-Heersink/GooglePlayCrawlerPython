@@ -317,7 +317,7 @@ class APKfetch(object):
         @reviews: the list of reviews from a specific app
         """
 
-        with open("apps/appinfo.csv", "a") as csvfile:
+        with open("apps/data/appinfo.csv", "a") as csvfile:
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file.writerow([details.docid, details.backendDocid, details.title, details.descriptionHtml,
                            details.descriptionShort,
@@ -340,7 +340,7 @@ class APKfetch(object):
                            details.details.appDetails.hasInstantLink, details.details.appDetails.containsAds])
             csvfile.close()
 
-        with open("apps/permissions.csv", "a") as csvfile:
+        with open("apps/data/permissions.csv", "a") as csvfile:
             with open("templatePermissions.csv", "r") as permissionsFile:
                 permissions = csv.reader(permissionsFile, delimiter=',', quotechar='"')
                 file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -355,7 +355,7 @@ class APKfetch(object):
                 permissionsFile.close()
             csvfile.close()
 
-        with open("apps/externalpermissions.csv", "a") as csvfile:
+        with open("apps/data/externalpermissions.csv", "a") as csvfile:
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             externalpermissions = [details.docid]
             for row in details.details.appDetails.permission:
@@ -367,7 +367,7 @@ class APKfetch(object):
 
         # TODO implement technical
 
-        with open("apps/images.csv", "a") as csvfile:
+        with open("apps/data/images.csv", "a") as csvfile:
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             imageurls = [details.docid]
             for image in details.image:
@@ -376,7 +376,7 @@ class APKfetch(object):
             file.writerow(imageurls)
             csvfile.close()
 
-        with open("apps/reviews.csv", "a") as csvfile:
+        with open("apps/data/reviews.csv", "a") as csvfile:
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
             for data in reviews.review:
