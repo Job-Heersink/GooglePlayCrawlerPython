@@ -15,6 +15,7 @@ import apkfetch_pb2
 from util import encrypt
 
 ITERMAX = 500
+DOWNLOADAPPS = False
 
 DOWNLOAD_FOLDER_PATH = 'apps/'
 
@@ -132,9 +133,9 @@ class APKfetch(object):
         # print(details_response.payload.detailsResponse.docV2)
         details = details_response.payload.detailsResponse.docV2
         if not details:
-            logging.error('Could not get details for: ' + package_name)
+            RuntimeError('Could not get details for: ' + package_name)
         if details_response.commands.displayErrorMessage != "":
-            logging.error(
+            RuntimeError(
                 'error getting details: ' + details_response.commands.displayErrorMessage + " for: " + package_name)
         return details
 
@@ -160,9 +161,9 @@ class APKfetch(object):
         review_response.ParseFromString(response.content)
 
         if not review_response:
-            logging.error('Could not get reviews for: ' + package_name)
+            RuntimeError('Could not get reviews for: ' + package_name)
         if review_response.commands.displayErrorMessage != "":
-            logging.error(
+            RuntimeError(
                 'error getting reviews: ' + review_response.commands.displayErrorMessage + " for: " + package_name)
         return review_response.payload.reviewResponse.getResponse
 
@@ -232,7 +233,7 @@ class APKfetch(object):
 
         response = apkfetch_pb2.ResponseWrapper.FromString(response.content)
         if response.commands.displayErrorMessage != "":
-            logging.error(
+            RuntimeError(
                 'error performing purchase: ' + response.commands.displayErrorMessage + " for: " + package_name)
         else:
             downloadtoken = response.payload.buyResponse.downloadToken
@@ -288,9 +289,9 @@ class APKfetch(object):
         # print(related_response.preFetch[0].response.payload.listResponse.doc)
 
         if not related_response:
-            logging.error('Could not get related apps for')
+            RuntimeError('Could not get related apps for')
         if related_response.commands.displayErrorMessage != "":
-            logging.error('error getting related apps: ' + related_response.commands.displayErrorMessage)
+            RuntimeError('error getting related apps: ' + related_response.commands.displayErrorMessage)
         return related_response.preFetch[0].response.payload.listResponse.doc[0]
 
     def loadvisitedapps(self):
@@ -298,7 +299,7 @@ class APKfetch(object):
         load all apps previously visited from the appinfo.csv file
         """
 
-        with open("apps/appinfo.csv", "r") as csvfile:
+        with open("apps/data/appinfo.csv", "r") as csvfile:
             file = csv.reader(csvfile, delimiter=',', quotechar='"')
             visitedapps = []
 
@@ -387,30 +388,40 @@ class APKfetch(object):
 
     def crawl(self, package_name, visitedpackages=[]):
         """
-        crawls throught the google play store, provided with a starting package
+        crawls through the google play store, provided with a starting package
         @package_name: the package to start from
         @visitedpackages: a list of packages already visited
         """
         time.sleep(1)
-        logging.info("started crawling through " + package_name + " on iteration: {}".format(self.iter))
-        print("started crawling through " + package_name + " on iteration: {}".format(self.iter))
-        details = self.details(package_name)
-        version = details.details.appDetails.versionCode
-        reviews = self.reviews(package_name)
 
-        # TODO can even get more related links like similar apps, more from spotify etc
+        try:
+            logging.info("started crawling through " + package_name + " on iteration: {}".format(self.iter))
+            print("started crawling through " + package_name + " on iteration: {}".format(self.iter))
+            details = self.details(package_name)
+            version = details.details.appDetails.versionCode
+            reviews = self.reviews(package_name)
 
-        self.store(details, reviews)
+            if not DOWNLOADAPPS:
+                logging.info("downloading is turned off")
+            elif details.offer[0].micros > 0:
+                logging.warning("This app needs to be paid for in order to download")
+            else:
+                if self.purchase(package_name, version):
+                    logging.info("successful purchase")
+                if self.fetch(package_name, version):
+                    logging.info('Downloaded version {}'.format(version))
 
-        if details.offer[0].micros == 0:
-            if self.purchase(package_name, version):
-                logging.info("successful purchase")
-            if self.fetch(package_name, version):
-                logging.info('Downloaded version {}'.format(version))
-        else:
-            logging.warning("This app needs to be paid for in order to download")
+            relatedapps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)
 
-        relatedapps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)
+            # TODO can even get more related links like similar apps, more from spotify etc
+            self.store(details, reviews)
+
+        except Exception as e:
+            print('Error:', str(e))
+            logging.error('error: '+str(e)+". moving on to the next app")
+            time.sleep(10)
+            return
+
         for app in relatedapps.child:
             if app.docid not in visitedpackages and self.iter < ITERMAX:
                 self.iter += 1
@@ -431,7 +442,11 @@ def main(argv):
     parser.add_argument('--version', '-v', help='Download a specific version of the app')
 
     # prepare logging file
-    logging.basicConfig(filename=datetime.now().strftime("logs/%Y-%m-%d_%H:%M:%S.log"), level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
+    logging.basicConfig(filename=datetime.now().strftime("logs/%Y-%m-%d_%H:%M:%S.log"), level=logging.INFO,
+                        format="%(asctime)s - %(levelname)s: %(message)s")
+
+    # start timing the program
+    start_time = time.time()
 
     try:
         # assign parsed values
@@ -441,7 +456,7 @@ def main(argv):
         passwd = args.passwd
         androidid = args.androidid
         package = args.package
-        #version = args.version
+        # version = args.version
 
         if not user or not passwd or not package or not androidid:
             parser.print_usage()
@@ -461,16 +476,18 @@ def main(argv):
 
         time.sleep(1)
 
-        visitedapps = apk.loadvisitedapps()
-        if package not in visitedapps:
-            apk.crawl(package, visitedapps)
-
-        print("finished crawling")
-
-
     except Exception as e:
-        print('Error:', str(e))
+        print('authentication error:', str(e))
+        logging.critical('authentication error:' + str(e) + ". terminating program")
         sys.exit(1)
+
+    visitedapps = apk.loadvisitedapps()
+    if package not in visitedapps:
+        apk.crawl(package, visitedapps)
+
+    print("finished crawling")
+    print("crawled through {} apps in {:.1f} seconds".format(apk.iter, time.time() - start_time))
+    logging.info("crawled through {} apps in {:.1f} seconds".format(apk.iter, time.time() - start_time))
 
 
 if __name__ == "__main__":
