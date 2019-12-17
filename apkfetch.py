@@ -320,7 +320,7 @@ class APKfetch(object):
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file.writerow([details.docid, details.backendDocid, details.title, details.descriptionHtml,
                            details.descriptionShort,
-                           "https://play.google.com/store/apps/details?" + details.docid + "&hl=en", "!TODO GENRE!",
+                           "https://play.google.com/store/apps/details?id=" + details.docid + "&hl=en", "!TODO GENRE!",
                            details.details.appDetails.appType,
                            details.offer[0].micros, details.offer[0].currencyCode,
                            details.details.appDetails.numDownloads, details.relatedLinks.rated.label,
