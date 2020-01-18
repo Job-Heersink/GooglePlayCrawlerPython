@@ -12,7 +12,7 @@ import apkfetch_pb2
 from util import encrypt
 from lxml import html
 
-### tweak these values according to your needs ###
+# tweak these values according to your needs #
 DOWNLOAD_APPS = True  # should the crawler download the apk files?
 STORE_INFO = True  # should the crawler store the information in the .csv files?
 REVIEWS = 50  # amount of reviews to get per app
@@ -417,7 +417,7 @@ class GooglePlayCrawler(object):
 
             csv_file.close()
 
-    def visitapp(self, package_name):
+    def visit_app(self, package_name):
         """
         gets and stores the information and reviews of a specific package and downloads the apkfile
         @package_name: the package to start from
@@ -457,14 +457,14 @@ class GooglePlayCrawler(object):
         time.sleep(1)
 
         try:
-            related_apps = self.visitapp(package_name)
+            related_apps = self.visit_app(package_name)
         except Exception as e:
             print('Error:', str(e))
             logging.error('error: ' + str(e) + ".\n Probably a server timeout. Waiting and trying again.")
             time.sleep(10)
 
             try:
-                related_apps = self.visitapp(package_name)
+                related_apps = self.visit_app(package_name)
             except Exception as e:
                 print('Error:', str(e))
                 logging.critical('critical error: ' + str(e) + ".\n Second try failed. Skipping this app and moving "
