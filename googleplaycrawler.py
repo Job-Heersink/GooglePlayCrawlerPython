@@ -502,12 +502,12 @@ def main(argv):
         args = parser.parse_args(sys.argv[1:])
 
         user = args.user
-        passwd = args.passwd
-        androidid = args.androidid
+        password = args.passwd
+        android_id = args.androidid
         package = args.package
         max_iterations = args.iterations
 
-        if not user or not passwd or not package or not androidid:
+        if not user or not password or not package or not android_id:
             parser.print_usage()
             raise ValueError('user, passwd, androidid and package are required options. android ID can be found using '
                              'Device id on your android device using an app from the playstore')
@@ -517,9 +517,9 @@ def main(argv):
         print("crawling through the playstore")
 
         # login
-        apk.login(user, passwd, androidid)
+        apk.login(user, password, android_id)
 
-        if not androidid and apk.android_id:
+        if not android_id and apk.android_id:
             print('AndroidID', apk.android_id)
 
         time.sleep(1)
@@ -529,9 +529,9 @@ def main(argv):
         logging.critical('authentication error:' + str(e) + ". terminating program")
         sys.exit(1)
 
-    visitedapps = apk.load_visited_apps()
-    if package not in visitedapps:
-        apk.crawl(package, visitedapps, max_iterations)
+    visited_apps = apk.load_visited_apps()
+    if package not in visited_apps:
+        apk.crawl(package, visited_apps, max_iterations)
     else:
         print("package has been visited before. Pick a new package to start from or run resetcsvfiles.py to start over")
         logging.info(
