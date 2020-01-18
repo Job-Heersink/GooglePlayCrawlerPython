@@ -10,10 +10,13 @@ import csv
 import logging
 import apkfetch_pb2
 from util import encrypt
-import warnings
+from lxml import html
 
-ITERMAX = 500
-DOWNLOADAPPS = True
+### tweak these values according to your needs ###
+DOWNLOADAPPS = True  # should the crawler download the apk files?
+STOREINFO = True  # should the crawler store the information in the .csv files?
+REVIEWS = 50  # amount of reviews to get per app
+
 
 DOWNLOAD_FOLDER_PATH = 'apps/'
 
@@ -45,7 +48,7 @@ class APKfetch(object):
     def __init__(self):
         self.session = requests.Session()
         self.user = self.passwd = self.androidid = self.token = self.auth = None
-        self.iter = 0
+        self.iter = 1
 
     def request_service(self, service, app, user_agent=LOGIN_USER_AGENT):
         """
@@ -292,6 +295,18 @@ class APKfetch(object):
             RuntimeError('error getting related apps: ' + related_response.commands.displayErrorMessage)
         return related_response.preFetch[0].response.payload.listResponse.doc[0]
 
+    def getCategory(self, url):
+        page = requests.get(url)
+        tree = html.fromstring(page.content)
+        category = tree.xpath('//a[@itemprop="genre"]/text()')
+        return category
+
+    def getAndroidVersion(self, url):
+        page = requests.get(url)
+        tree = html.fromstring(page.content)
+        version = tree.xpath('//span[@class="htlgb"]/text()')
+        return version[4]
+
     def loadvisitedapps(self):
         """
         load all apps previously visited from the appinfo.csv file
@@ -306,22 +321,43 @@ class APKfetch(object):
 
             csvfile.close()
 
+        # pop the column names
         visitedapps.pop(0)
+
+        logging.info(
+            str(len(visitedapps)) + " previously crawled apps loaded. This crawler won't crawl through these apps.")
         return visitedapps
 
-    def store(self, details, reviews):
+    def store(self, details, reviews, related_apps):
         """
         store the details and reviews of an app into a .csv file
         @details: the list of details of a specific app
         @reviews: the list of reviews from a specific app
+        @related_apps: a list of related apps
         """
 
+        # TODO: category doesnt work
         with open("apps/data/appinfo.csv", "a") as csvfile:
+
+            related_apps_string = ""
+            for app in related_apps:
+                related_apps_string += app.docid + ","
+            related_apps_string = related_apps_string[:-1]
+
+            url = "https://play.google.com/store/apps/details?id=" + details.docid + "&hl=en"
+
+            category_string = ""
+            for category in self.getCategory(url):
+                category_string += category + ","
+            category_string = category_string[:-1]
+
+            androidVersion = self.getAndroidVersion(url)
+
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file.writerow([details.docid, details.backendDocid, details.title, details.descriptionHtml,
                            details.descriptionShort,
-                           "https://play.google.com/store/apps/details?" + details.docid + "&hl=en", "!TODO GENRE!",
-                           details.details.appDetails.appType,
+                           url, "https://android.clients.google.com/fdfe/" + details.relatedLinks.youMightAlsoLike.url2,
+                           related_apps_string, category_string, details.details.appDetails.appType,
                            details.offer[0].micros, details.offer[0].currencyCode,
                            details.details.appDetails.numDownloads, details.relatedLinks.rated.label,
                            details.aggregateRating.starRating, details.aggregateRating.ratingsCount,
@@ -334,7 +370,7 @@ class APKfetch(object):
                            details.relatedLinks.privacyPolicyUrl,
                            details.details.appDetails.versionCode, details.details.appDetails.versionString,
                            details.details.appDetails.uploadDate,
-                           details.details.appDetails.recentChangesHtml, "!!!",
+                           details.details.appDetails.recentChangesHtml, androidVersion,
                            details.details.appDetails.installationSize, details.details.appDetails.unstable,
                            details.details.appDetails.hasInstantLink, details.details.appDetails.containsAds])
             csvfile.close()
@@ -364,8 +400,6 @@ class APKfetch(object):
             file.writerow(externalpermissions)
             csvfile.close()
 
-        # TODO implement technical
-
         with open("apps/data/images.csv", "a") as csvfile:
             file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             imageurls = [details.docid]
@@ -394,7 +428,7 @@ class APKfetch(object):
         print("started crawling through " + package_name + " on iteration: {}".format(self.iter))
         details = self.details(package_name)
         version = details.details.appDetails.versionCode
-        reviews = self.reviews(package_name)
+        reviews = self.reviews(package_name, REVIEWS)
 
         if not DOWNLOADAPPS:
             logging.info("downloading is turned off")
@@ -409,12 +443,12 @@ class APKfetch(object):
 
         related_apps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)
 
-        # TODO can even get more related links like similar apps, more from spotify etc
-        self.store(details, reviews)
+        if STOREINFO:
+            self.store(details, reviews, related_apps.child)
 
         return related_apps.child
 
-    def crawl(self, package_name, visited_packages=[]):
+    def crawl(self, package_name, visited_packages=[], max_iterations=1):
         """
         crawls through the google play store, provided with a starting package
         @package_name: the package to start from
@@ -439,7 +473,7 @@ class APKfetch(object):
                 return
 
         for app in related_apps:
-            if app.docid not in visited_packages and self.iter < ITERMAX:
+            if app.docid not in visited_packages and self.iter < max_iterations:
                 self.iter += 1
                 visited_packages += [app.docid]
                 self.crawl(app.docid, visited_packages)
@@ -455,7 +489,7 @@ def main(argv):
     parser.add_argument('--passwd', '-p', help='Google password')
     parser.add_argument('--androidid', '-a', help='AndroidID')
     parser.add_argument('--package', '-k', help='Package name of the app')
-    parser.add_argument('--version', '-v', help='Download a specific version of the app')
+    parser.add_argument('--iterations', '-i', help='Amount of apps you want to crawl through')
 
     # prepare logging file
     logging.basicConfig(filename=datetime.now().strftime("logs/%Y-%m-%d_%H:%M:%S.log"), level=logging.INFO,
@@ -472,16 +506,15 @@ def main(argv):
         passwd = args.passwd
         androidid = args.androidid
         package = args.package
-        # version = args.version
+        max_iterations = args.iterations
 
         if not user or not passwd or not package or not androidid:
             parser.print_usage()
             raise ValueError('user, passwd, androidid and package are required options. android ID can be found using '
-                             'Device id (playstore) on your android device')
+                             'Device id on your android device using an app from the playstore')
 
-            # create class
+        # create class
         apk = APKfetch()
-
         print("crawling through the playstore")
 
         # login
@@ -499,7 +532,11 @@ def main(argv):
 
     visitedapps = apk.loadvisitedapps()
     if package not in visitedapps:
-        apk.crawl(package, visitedapps)
+        apk.crawl(package, visitedapps, max_iterations)
+    else:
+        print("package has been visited before. Pick a new package to start from or run resetcsvfiles.py to start over")
+        logging.info(
+            "package has been visited before. Pick a new package to start from or run resetcsvfiles.py to start over")
 
     print("finished crawling")
     print("crawled through {} apps in {:.1f} seconds".format(apk.iter, time.time() - start_time))

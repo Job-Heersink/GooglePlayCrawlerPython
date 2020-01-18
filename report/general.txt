@@ -66,6 +66,9 @@ I managed to get the formatting correct. There is one problem though. an app can
 
 apps that went wrong com.kodarkooperativet.blackplayerex
 
+fixed android version
+fixed category info
+
 login info
 email: playstorecrawler00@gmail.com
 ww: IAmAGooglePlayCrawler

@@ -11,14 +11,12 @@ def main(argv):
     with open("apps/data/appinfo.csv", "w") as csvfile:
         file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         file.writerow(
-            ['Pkgname', 'backendPkgname', 'Title', 'Description', 'ShortDescription', 'Url', 'Genre', 'Type',
-             'Price', 'CurrencyCode', 'Downloads', 'PGRating', 'AverageRating', 'RatingCount', 'FiveStarRatings',
-             'FourStarRatings',
-             'ThreeStarRatings', 'TwoStarRatings', 'OneStarRatings', 'DeveloperAddress', 'DeveloperEmail',
-             'DeveloperWebsite',
-             'developerName', 'Creator', 'PrivacyPolicyLink', 'CurrentVersion', 'CurrentVersionString',
-             'LastUpdated',
-             'recentChanges', 'AndroidVersion', 'FileSize', 'isUnstable', 'hasInstantLink', 'containsAds'])
+            ['Pkgname', 'backendPkgname', 'Title', 'Description', 'ShortDescription', 'Url', 'RelatedAppsLink',
+             'RelatedApps', 'Genre', 'Type', 'Price', 'CurrencyCode', 'Downloads', 'PGRating', 'AverageRating',
+             'RatingCount', 'FiveStarRatings', 'FourStarRatings', 'ThreeStarRatings', 'TwoStarRatings',
+             'OneStarRatings', 'DeveloperAddress', 'DeveloperEmail', 'DeveloperWebsite', 'developerName', 'Creator',
+             'PrivacyPolicyLink', 'CurrentVersion', 'CurrentVersionString', 'LastUpdated', 'recentChanges',
+             'AndroidVersion', 'FileSize', 'isUnstable', 'hasInstantLink', 'containsAds'])
         csvfile.close()
 
     with open("apps/data/externalpermissions.csv", "w") as csvfile:
