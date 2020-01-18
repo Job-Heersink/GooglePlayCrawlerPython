@@ -48,7 +48,7 @@ class GooglePlayCrawler(object):
     def __init__(self):
         self.session = requests.Session()
         self.user = self.password = self.android_id = self.token = self.auth = None
-        self.iter = 1
+        self.iter = 0
 
     def request_service(self, service, app, user_agent=LOGIN_USER_AGENT):
         """
@@ -455,6 +455,7 @@ class GooglePlayCrawler(object):
         """
 
         time.sleep(1)
+        self.iter += 1
 
         try:
             related_apps = self.visit_app(package_name)
@@ -473,7 +474,7 @@ class GooglePlayCrawler(object):
 
         for app in related_apps:
             if app.docid not in visited_packages and self.iter < max_iterations:
-                self.iter += 1
+                print(str(self.iter) + " and " + str(max_iterations))
                 visited_packages += [app.docid]
                 self.crawl(app.docid, visited_packages)
 
@@ -488,7 +489,7 @@ def main(argv):
     parser.add_argument('--passwd', '-p', help='Google password')
     parser.add_argument('--androidid', '-a', help='AndroidID')
     parser.add_argument('--package', '-k', help='Package name of the app')
-    parser.add_argument('--iterations', '-i', help='Amount of apps you want to crawl through')
+    parser.add_argument('--iterations', '-i', help='Amount of apps you want to crawl through', type=int)
 
     # prepare logging file
     logging.basicConfig(filename=datetime.now().strftime("logs/%Y-%m-%d_%H:%M:%S.log"), level=logging.INFO,
