@@ -17,7 +17,6 @@ DOWNLOAD_APPS = False  # should the crawler download the apk files?
 STORE_INFO = True  # should the crawler store the information in the .csv files?
 REVIEWS = 50  # amount of reviews to get per app
 
-
 DOWNLOAD_FOLDER_PATH = 'apps/'
 
 GOOGLE_LOGIN_URL = 'https://android.clients.google.com/auth'
@@ -478,8 +477,6 @@ class GooglePlayCrawler(object):
                 self.crawl(app.docid, visited_packages, max_iterations)
 
 
-
-
 def main(argv):
     # parse arguments
     parser = argparse.ArgumentParser(add_help=False, description=(
@@ -533,7 +530,7 @@ def main(argv):
 
     visited_apps = apk.load_visited_apps()
     if package not in visited_apps:
-        logging.info("initiated crawling for "+str(max_iterations)+" apps")
+        logging.info("initiated crawling for " + str(max_iterations) + " apps")
         apk.crawl(package, visited_apps, max_iterations)
     else:
         print("package has been visited before. Pick a new package to start from or run resetcsvfiles.py to start over")
