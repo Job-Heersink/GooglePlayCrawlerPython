@@ -378,14 +378,14 @@ class GooglePlayCrawler(object):
             with open("templatePermissions.csv", "r") as permissionsFile:
                 permissions = csv.reader(permissionsFile, delimiter=',', quotechar='"')
                 file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                haspermission = [details.docid]
+                has_permission = [details.docid]
                 for row in permissions:
                     if row[0] in details.details.appDetails.permission:
-                        haspermission += [1]
+                        has_permission += [1]
                     else:
-                        haspermission += [0]
+                        has_permission += [0]
 
-                file.writerow(haspermission)
+                file.writerow(has_permission)
                 permissionsFile.close()
             csv_file.close()
 
