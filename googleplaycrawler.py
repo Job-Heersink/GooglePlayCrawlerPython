@@ -13,8 +13,8 @@ from util import encrypt
 from lxml import html
 
 ### tweak these values according to your needs ###
-DOWNLOADAPPS = True  # should the crawler download the apk files?
-STOREINFO = True  # should the crawler store the information in the .csv files?
+DOWNLOAD_APPS = True  # should the crawler download the apk files?
+STORE_INFO = True  # should the crawler store the information in the .csv files?
 REVIEWS = 50  # amount of reviews to get per app
 
 
@@ -43,11 +43,11 @@ def num_to_hex(num):
     return hex_str.zfill(length + length % 2)
 
 
-class APKfetch(object):
+class GooglePlayCrawler(object):
 
     def __init__(self):
         self.session = requests.Session()
-        self.user = self.passwd = self.androidid = self.token = self.auth = None
+        self.user = self.password = self.android_id = self.token = self.auth = None
         self.iter = 1
 
     def request_service(self, service, app, user_agent=LOGIN_USER_AGENT):
@@ -61,8 +61,8 @@ class APKfetch(object):
         self.session.headers.update({'User-Agent': user_agent,
                                      'Content-Type': 'application/x-www-form-urlencoded'})
 
-        if self.androidid:
-            self.session.headers.update({'device': self.androidid})
+        if self.android_id:
+            self.session.headers.update({'device': self.android_id})
 
         data = {'accountType': 'HOSTED_OR_GOOGLE',
                 'has_permission': '1',
@@ -73,10 +73,10 @@ class APKfetch(object):
                 'source': 'android',
                 'Email': self.user}
 
-        if self.androidid:
-            data['androidId'] = self.androidid
+        if self.android_id:
+            data['androidId'] = self.android_id
 
-        data['EncryptedPasswd'] = self.token or encrypt(self.user, self.passwd)
+        data['EncryptedPasswd'] = self.token or encrypt(self.user, self.password)
 
         response = self.session.post(GOOGLE_LOGIN_URL, data=data, allow_redirects=True)
         response_values = dict([line.split('=', 1) for line in response.text.splitlines()])
@@ -92,7 +92,7 @@ class APKfetch(object):
 
         return response_values.get('Token', None), response_values.get('Auth')
 
-    def login(self, user, passwd, androidid=None):
+    def login(self, user, password, android_id=None):
         """
         login using googles as2dm authentication system
         @user: email
@@ -101,8 +101,8 @@ class APKfetch(object):
         """
 
         self.user = user
-        self.passwd = passwd
-        self.androidid = androidid
+        self.password = password
+        self.android_id = android_id
 
         self.token, self.auth = self.request_service('ac2dm', 'com.google.android.gsf')
 
@@ -119,7 +119,7 @@ class APKfetch(object):
         @package_name: the app to get details from
         """
 
-        headers = {'X-DFE-Device-Id': self.androidid,
+        headers = {'X-DFE-Device-Id': self.android_id,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
                    'Host': 'android.clients.google.com',
@@ -147,7 +147,7 @@ class APKfetch(object):
         @amount: amount of reviews to get
         """
 
-        headers = {'X-DFE-Device-Id': self.androidid,
+        headers = {'X-DFE-Device-Id': self.android_id,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
                    'Host': 'android.clients.google.com',
@@ -175,7 +175,7 @@ class APKfetch(object):
         @version_code: the version of the app to download
         """
 
-        headers = {'X-DFE-Device-Id': self.androidid,
+        headers = {'X-DFE-Device-Id': self.android_id,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
                    'Host': 'android.clients.google.com',
@@ -212,7 +212,7 @@ class APKfetch(object):
         headers = {
             "X-DFE-Encoded-Targets": "CAEScFfqlIEG6gUYogFWrAISK1WDAg+hAZoCDgIU1gYEOIACFkLMAeQBnASLATlASUuyAyqCAjY5igOMBQzfA/IClwFbApUC4ANbtgKVAS7OAX8YswHFBhgDwAOPAmGEBt4OfKkB5weSB5AFASkiN68akgMaxAMSAQEBA9kBO7UBFE1KVwIDBGs3go6BBgEBAgMECQgJAQIEAQMEAQMBBQEBBAUEFQYCBgUEAwMBDwIBAgOrARwBEwMEAg0mrwESfTEcAQEKG4EBMxghChMBDwYGASI3hAEODEwXCVh/EREZA4sBYwEdFAgIIwkQcGQRDzQ2fTC2AjfVAQIBAYoBGRg2FhYFBwEqNzACJShzFFblAo0CFxpFNBzaAd0DHjIRI4sBJZcBPdwBCQGhAUd2A7kBLBVPngEECHl0UEUMtQETigHMAgUFCc0BBUUlTywdHDgBiAJ+vgKhAU0uAcYCAWQ/5ALUAw1UwQHUBpIBCdQDhgL4AY4CBQICjARbGFBGWzA1CAEMOQH+BRAOCAZywAIDyQZ2MgM3BxsoAgUEBwcHFia3AgcGTBwHBYwBAlcBggFxSGgIrAEEBw4QEqUCASsWadsHCgUCBQMD7QICA3tXCUw7ugJZAwGyAUwpIwM5AwkDBQMJA5sBCw8BNxBVVBwVKhebARkBAwsQEAgEAhESAgQJEBCZATMdzgEBBwG8AQQYKSMUkAEDAwY/CTs4/wEaAUt1AwEDAQUBAgIEAwYEDx1dB2wGeBFgTQ",
             "User-Agent": MARKET_USER_AGENT,
-            'X-DFE-Device-Id': self.androidid,
+            'X-DFE-Device-Id': self.android_id,
             "X-DFE-Client-Id": "am-android-google",
             'Host': 'android.clients.google.com',
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -237,8 +237,8 @@ class APKfetch(object):
             RuntimeError(
                 'error performing purchase: ' + response.commands.displayErrorMessage + " for: " + package_name)
         else:
-            downloadtoken = response.payload.buyResponse.downloadToken
-            return downloadtoken
+            download_token = response.payload.buyResponse.downloadToken
+            return download_token
 
     def fetch(self, package_name, version_code, apk_fn=None):
         """
@@ -275,7 +275,7 @@ class APKfetch(object):
         @browsestream: the link from the app details to request the list of related apps
         """
 
-        headers = {'X-DFE-Device-Id': self.androidid,
+        headers = {'X-DFE-Device-Id': self.android_id,
                    'X-DFE-Client-Id': 'am-android-google',
                    'Accept-Encoding': '',
                    'Host': 'android.clients.google.com',
@@ -295,38 +295,38 @@ class APKfetch(object):
             RuntimeError('error getting related apps: ' + related_response.commands.displayErrorMessage)
         return related_response.preFetch[0].response.payload.listResponse.doc[0]
 
-    def getCategory(self, url):
+    def get_category(self, url):
         page = requests.get(url)
         tree = html.fromstring(page.content)
         category = tree.xpath('//a[@itemprop="genre"]/text()')
         return category
 
-    def getAndroidVersion(self, url):
+    def get_android_version(self, url):
         page = requests.get(url)
         tree = html.fromstring(page.content)
         version = tree.xpath('//span[@class="htlgb"]/text()')
         return version[4]
 
-    def loadvisitedapps(self):
+    def load_visited_apps(self):
         """
         load all apps previously visited from the appinfo.csv file
         """
 
         with open("apps/data/appinfo.csv", "r") as csvfile:
             file = csv.reader(csvfile, delimiter=',', quotechar='"')
-            visitedapps = []
+            visited_apps = []
 
             for row in file:
-                visitedapps += [row[0]]
+                visited_apps += [row[0]]
 
             csvfile.close()
 
         # pop the column names
-        visitedapps.pop(0)
+        visited_apps.pop(0)
 
         logging.info(
-            str(len(visitedapps)) + " previously crawled apps loaded. This crawler won't crawl through these apps.")
-        return visitedapps
+            str(len(visited_apps)) + " previously crawled apps loaded. This crawler won't crawl through these apps.")
+        return visited_apps
 
     def store(self, details, reviews, related_apps):
         """
@@ -336,8 +336,7 @@ class APKfetch(object):
         @related_apps: a list of related apps
         """
 
-        # TODO: category doesnt work
-        with open("apps/data/appinfo.csv", "a") as csvfile:
+        with open("apps/data/appinfo.csv", "a") as csv_file:
 
             related_apps_string = ""
             for app in related_apps:
@@ -347,13 +346,13 @@ class APKfetch(object):
             url = "https://play.google.com/store/apps/details?id=" + details.docid + "&hl=en"
 
             category_string = ""
-            for category in self.getCategory(url):
+            for category in self.get_category(url):
                 category_string += category + ","
             category_string = category_string[:-1]
 
-            androidVersion = self.getAndroidVersion(url)
+            android_version = self.get_android_version(url)
 
-            file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file.writerow([details.docid, details.backendDocid, details.title, details.descriptionHtml,
                            details.descriptionShort,
                            url, "https://android.clients.google.com/fdfe/" + details.relatedLinks.youMightAlsoLike.url2,
@@ -370,15 +369,15 @@ class APKfetch(object):
                            details.relatedLinks.privacyPolicyUrl,
                            details.details.appDetails.versionCode, details.details.appDetails.versionString,
                            details.details.appDetails.uploadDate,
-                           details.details.appDetails.recentChangesHtml, androidVersion,
+                           details.details.appDetails.recentChangesHtml, android_version,
                            details.details.appDetails.installationSize, details.details.appDetails.unstable,
                            details.details.appDetails.hasInstantLink, details.details.appDetails.containsAds])
-            csvfile.close()
+            csv_file.close()
 
-        with open("apps/data/permissions.csv", "a") as csvfile:
+        with open("apps/data/permissions.csv", "a") as csv_file:
             with open("templatePermissions.csv", "r") as permissionsFile:
                 permissions = csv.reader(permissionsFile, delimiter=',', quotechar='"')
-                file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 haspermission = [details.docid]
                 for row in permissions:
                     if row[0] in details.details.appDetails.permission:
@@ -388,35 +387,35 @@ class APKfetch(object):
 
                 file.writerow(haspermission)
                 permissionsFile.close()
-            csvfile.close()
+            csv_file.close()
 
-        with open("apps/data/externalpermissions.csv", "a") as csvfile:
-            file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            externalpermissions = [details.docid]
+        with open("apps/data/externalpermissions.csv", "a") as csv_file:
+            file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            external_permissions = [details.docid]
             for row in details.details.appDetails.permission:
                 if not row.startswith("android.permission."):
-                    externalpermissions += [row]
+                    external_permissions += [row]
 
-            file.writerow(externalpermissions)
-            csvfile.close()
+            file.writerow(external_permissions)
+            csv_file.close()
 
-        with open("apps/data/images.csv", "a") as csvfile:
-            file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            imageurls = [details.docid]
+        with open("apps/data/images.csv", "a") as csv_file:
+            file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            image_urls = [details.docid]
             for image in details.image:
-                imageurls += [image.imageUrl]
+                image_urls += [image.imageUrl]
 
-            file.writerow(imageurls)
-            csvfile.close()
+            file.writerow(image_urls)
+            csv_file.close()
 
-        with open("apps/data/reviews.csv", "a") as csvfile:
-            file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        with open("apps/data/reviews.csv", "a") as csv_file:
+            file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
             for data in reviews.review:
                 file.writerow([details.docid, data.documentVersion, data.timestampMsec, data.starRating, data.comment,
                                data.userProfile.personId, data.userProfile.name, data.userProfile.image[0].imageUrl])
 
-            csvfile.close()
+            csv_file.close()
 
     def visitapp(self, package_name):
         """
@@ -430,7 +429,7 @@ class APKfetch(object):
         version = details.details.appDetails.versionCode
         reviews = self.reviews(package_name, REVIEWS)
 
-        if not DOWNLOADAPPS:
+        if not DOWNLOAD_APPS:
             logging.info("downloading is turned off")
             time.sleep(5)
         elif details.offer[0].micros > 0:
@@ -443,12 +442,12 @@ class APKfetch(object):
 
         related_apps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)
 
-        if STOREINFO:
+        if STORE_INFO:
             self.store(details, reviews, related_apps.child)
 
         return related_apps.child
 
-    def crawl(self, package_name, visited_packages=[], max_iterations=1):
+    def crawl(self, package_name, visited_packages, max_iterations=1):
         """
         crawls through the google play store, provided with a starting package
         @package_name: the package to start from
@@ -514,14 +513,14 @@ def main(argv):
                              'Device id on your android device using an app from the playstore')
 
         # create class
-        apk = APKfetch()
+        apk = GooglePlayCrawler()
         print("crawling through the playstore")
 
         # login
         apk.login(user, passwd, androidid)
 
-        if not androidid and apk.androidid:
-            print('AndroidID', apk.androidid)
+        if not androidid and apk.android_id:
+            print('AndroidID', apk.android_id)
 
         time.sleep(1)
 
@@ -530,7 +529,7 @@ def main(argv):
         logging.critical('authentication error:' + str(e) + ". terminating program")
         sys.exit(1)
 
-    visitedapps = apk.loadvisitedapps()
+    visitedapps = apk.load_visited_apps()
     if package not in visitedapps:
         apk.crawl(package, visitedapps, max_iterations)
     else:
