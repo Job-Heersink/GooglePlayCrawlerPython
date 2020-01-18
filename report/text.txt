@@ -1,0 +1,7 @@
+fix the genre, no matter how
+related app list insert into csv file in one block
+more lerated apps
+test for a 1000
+update README
+small progress report
+challenges lessons learned.
