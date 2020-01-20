@@ -38,7 +38,7 @@ Note that you do need an androidid for this program to work, you can get an andr
 ```
 usage: apkfetch.py [--help] [--user USER] [--passwd PASSWD]
                    [--androidid ANDROIDID] [--version VERSION]
-                   [--package PACKAGE]
+                   [--package PACKAGE] [--iterations ITERATIONS]
 
 Fetch APK files from the Google Play store
 
@@ -53,4 +53,6 @@ optional arguments:
                         Download a specific version of the app
   --package PACKAGE, -k PACKAGE
                         Package name of the app
+  --iterations ITERATIONS, -i ITERATIONS
+						The amount of apps to crawl through
 ``` 
