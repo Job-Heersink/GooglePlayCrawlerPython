@@ -15,6 +15,7 @@ from lxml import html
 # tweak these values according to your needs #
 DOWNLOAD_APPS = True  # should the crawler download the apk files?
 STORE_INFO = True  # should the crawler store the information in the .csv files?
+NO_DUPLICATE_DATA = True  # whether the app should check if the starting app is crawled through or not using the .csv files
 REVIEWS = 50  # amount of reviews to get per app
 WAIT = 1  # seconds to wait before crawling the next app
 
@@ -53,9 +54,10 @@ class GooglePlayCrawler(object):
     def request_service(self, service, app, user_agent=LOGIN_USER_AGENT):
         """
         requesting a login service from google
-        @service: the service to request, like ac2dm
-        @app: the app to request to
-        @user_agent: the user agent
+        :param service: the service to request, like ac2dm
+        :param app: the app to request to
+        :param user_agent: the user agent
+        :return: The response from the server
         """
 
         self.session.headers.update({'User-Agent': user_agent,
@@ -94,10 +96,11 @@ class GooglePlayCrawler(object):
 
     def login(self, user, password, android_id=None):
         """
-        login using googles as2dm authentication system
-        @user: email
-        @passwd: password
-        @androidid: android id
+        login using google's as2dm authentication system
+        :param user: email
+        :param password: password
+        :param android_id: android id
+        :return: True if the login was successful, False otherwise
         """
 
         self.user = user
@@ -116,7 +119,8 @@ class GooglePlayCrawler(object):
     def details(self, package_name):
         """
         performs a GET request to get the details of a specific app
-        @package_name: the app to get details from
+        :param package_name: the app to get details from
+        :return: the details of the app
         """
 
         headers = {'X-DFE-Device-Id': self.android_id,
@@ -131,7 +135,6 @@ class GooglePlayCrawler(object):
 
         details_response = apkfetch_pb2.ResponseWrapper()
         details_response.ParseFromString(response.content)
-        # print(details_response.payload.detailsResponse.docV2)
         details = details_response.payload.detailsResponse.docV2
         if not details:
             raise Exception('Could not get details for: ' + package_name)
@@ -143,8 +146,9 @@ class GooglePlayCrawler(object):
     def reviews(self, package_name, amount=50):
         """
         performs a GET request to get the reviews of a specific app
-        @package_name: the app to get reviews from
-        @amount: amount of reviews to get
+        :param package_name: the app to get reviews from
+        :param amount: amount of reviews to get
+        :return: a list of reviews
         """
 
         headers = {'X-DFE-Device-Id': self.android_id,
@@ -171,8 +175,9 @@ class GooglePlayCrawler(object):
     def get_download_url(self, package_name, version_code):
         """
         performs a GET request to get the download url of a specific app
-        @package_name: the app to get the download url from
-        @version_code: the version of the app to download
+        :param package_name: the app to get the download url from
+        :param version_code: the version of the app to download
+        :return: the download url
         """
 
         headers = {'X-DFE-Device-Id': self.android_id,
@@ -202,8 +207,9 @@ class GooglePlayCrawler(object):
     def purchase(self, package_name, version_code):
         """
         performs a GET request to get the download token of a specific app and complete the purchase
-        @package_name: the app to get the download token from
-        @version_code: the version of the app to get the download token from
+        :param package_name: the app to get the download token from
+        :param version_code: the version of the app to get the download token from
+        :return: return the download token
         """
 
         if version_code is None:
@@ -243,9 +249,10 @@ class GooglePlayCrawler(object):
     def fetch(self, package_name, version_code, apk_fn=None):
         """
         download the app, by getting a download url.
-        @package_name: the app to download
-        @version_code: the version of the app to download
-        @apk_fn: predefined name, package_name by default
+        :param package_name: the app to download
+        :param version_code: the version of the app to download
+        :param apk_fn: predefined name, package_name by default
+        :return: True if the download was successful, False otherwise.
         """
 
         url = self.get_download_url(package_name, version_code)
@@ -269,10 +276,11 @@ class GooglePlayCrawler(object):
 
         return os.path.exists(apk_fn)
 
-    def getrelated(self, browsestream):
+    def get_related(self, browse_stream):
         """
         get the list of apps under the "more you might like" section under app details
-        @browsestream: the link from the app details to request the list of related apps
+        :param browse_stream: the link from the app details to request the list of related apps
+        :return: a list of related apps and their details
         """
 
         headers = {'X-DFE-Device-Id': self.android_id,
@@ -282,12 +290,11 @@ class GooglePlayCrawler(object):
                    'Authorization': 'GoogleLogin Auth=' + self.auth,
                    'User-Agent': MARKET_USER_AGENT}
 
-        response = self.session.get(GOOGLE_FDFE_URL + "/" + browsestream, params=None, headers=headers,
+        response = self.session.get(GOOGLE_FDFE_URL + "/" + browse_stream, params=None, headers=headers,
                                     allow_redirects=True)
 
         related_response = apkfetch_pb2.ResponseWrapper()
         related_response.ParseFromString(response.content)
-        # print(related_response.preFetch[0].response.payload.listResponse.doc)
 
         if not related_response:
             raise Exception('Could not get related apps for')
@@ -296,12 +303,26 @@ class GooglePlayCrawler(object):
         return related_response.preFetch[0].response.payload.listResponse.doc[0]
 
     def get_category(self, url):
+        """
+        since the requests to the server do not return category information,
+        this function gets the information from the website
+        :param url: the apps url of the website version of the google play store
+        :return: a list of categories
+        """
+
         page = requests.get(url)
         tree = html.fromstring(page.content)
         category = tree.xpath('//a[@itemprop="genre"]/text()')
         return category
 
     def get_android_version(self, url):
+        """
+        since the requests to the server do not return android version information,
+        this function gets the information from the website
+        :param url: the apps url of the website version of the google play store
+        :return: the minimum required android version string
+        """
+
         page = requests.get(url)
         tree = html.fromstring(page.content)
         version = tree.xpath('//span[@class="htlgb"]/text()')
@@ -310,6 +331,7 @@ class GooglePlayCrawler(object):
     def load_visited_apps(self):
         """
         load all apps previously visited from the appinfo.csv file
+        :return: a list of previously crawled apps
         """
 
         with open("apps/data/appinfo.csv", "r") as csvfile:
@@ -331,9 +353,9 @@ class GooglePlayCrawler(object):
     def store(self, details, reviews, related_apps):
         """
         store the details and reviews of an app into a .csv file
-        @details: the list of details of a specific app
-        @reviews: the list of reviews from a specific app
-        @related_apps: a list of related apps
+        :param details: the list of details of a specific app
+        :param reviews: the list of reviews from a specific app
+        :param related_apps: a list of related apps
         """
 
         with open("apps/data/appinfo.csv", "a") as csv_file:
@@ -420,7 +442,8 @@ class GooglePlayCrawler(object):
     def visit_app(self, package_name):
         """
         gets and stores the information and reviews of a specific package and downloads the apkfile
-        @package_name: the package to start from
+        :param package_name: the package to start from
+        :return: a list of related apps to visit next
         """
 
         logging.info("started crawling through " + package_name + " on iteration: {}".format(self.iter))
@@ -440,7 +463,7 @@ class GooglePlayCrawler(object):
             if self.fetch(package_name, version):
                 logging.info('Downloaded version {}'.format(version))
 
-        related_apps = self.getrelated(details.relatedLinks.youMightAlsoLike.url2)
+        related_apps = self.get_related(details.relatedLinks.youMightAlsoLike.url2)
 
         if STORE_INFO:
             self.store(details, reviews, related_apps.child)
@@ -452,9 +475,9 @@ class GooglePlayCrawler(object):
         crawls through the google play store, provided with a starting package
         This is a recursive function. it crawls through the app, gets the information,
         the apk file and the related apps and moves on crawling through the related apps using recursion
-        @package_name: the package to start from
-        @visited_packages: a list of packages already visited
-        @max_iterations: the (max) amount of apps to crawl through
+        :param package_name: the package to start from
+        :param visited_packages: a list of packages already visited
+        :param max_iterations: the (max) amount of apps to crawl through
         """
 
         time.sleep(WAIT)
@@ -552,7 +575,7 @@ def main(argv):
         sys.exit(1)
 
     visited_apps = apk.load_visited_apps()
-    if package not in visited_apps:
+    if package not in visited_apps or not NO_DUPLICATE_DATA:
         logging.info("initiated crawling for " + str(max_iterations) + " apps")
         apk.crawl(package, visited_apps, max_iterations)
     else:
