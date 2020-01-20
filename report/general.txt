@@ -66,8 +66,14 @@ I managed to get the formatting correct. There is one problem though. an app can
 
 apps that went wrong com.kodarkooperativet.blackplayerex
 
-fixed android version
-fixed category info
+after the program did what he had to do. i needed to figure out the timeouts in between the steps.
+Running for 500 apps on my 20mb/s wifi did not give me a timeout. Only a few incomplete responses. Trying to get those responses again solved that problem.
+But when i tried to run for 1000 apps on my parants 100mbps glass fiber internet connection i started to get my first timeouts, since the speed of the downloads now significantly increased.
+First i noticed that after 300 apps, i got a server busy response when trying to get the download link. This server busy response would consisntently last for 20 minutes (tested 3 times). I concluded that this meant that i was requesting to much and was thus on a timeout. I made it so that the program would wait a maximum of 20 minutes. with 5 tests in between if the server is free or not. before proceeding to the next app. (the server busy error occurs for all apps. moving on to the next would not solve the problem.)
+fixed android version a timeout in between did not help. around 300 apps the error kept occuring (tested for 1 and 4 seconds in between apps)
+fixed category infomy internet 14 seconds parents 3 for snapchat.
+
+
 
 login info
 email: playstorecrawler00@gmail.com

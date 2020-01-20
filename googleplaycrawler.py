@@ -13,9 +13,10 @@ from util import encrypt
 from lxml import html
 
 # tweak these values according to your needs #
-DOWNLOAD_APPS = False  # should the crawler download the apk files?
+DOWNLOAD_APPS = True  # should the crawler download the apk files?
 STORE_INFO = True  # should the crawler store the information in the .csv files?
 REVIEWS = 50  # amount of reviews to get per app
+WAIT = 1  # seconds to wait before crawling the next app
 
 DOWNLOAD_FOLDER_PATH = 'apps/'
 
@@ -85,9 +86,9 @@ class GooglePlayCrawler(object):
             if 'Url' in response_values:
                 error_msg += '\n\nTo resolve the issue, visit: ' + response_values['Url']
                 error_msg += '\n\nOr try: https://accounts.google.com/b/0/DisplayUnlockCaptcha'
-            raise RuntimeError(error_msg)
+            raise Exception(error_msg)
         elif 'Auth' not in response_values:
-            raise RuntimeError('Could not login')
+            raise Exception('Could not login')
 
         return response_values.get('Token', None), response_values.get('Auth')
 
@@ -133,9 +134,9 @@ class GooglePlayCrawler(object):
         # print(details_response.payload.detailsResponse.docV2)
         details = details_response.payload.detailsResponse.docV2
         if not details:
-            RuntimeError('Could not get details for: ' + package_name)
+            raise Exception('Could not get details for: ' + package_name)
         if details_response.commands.displayErrorMessage != "":
-            RuntimeError(
+            raise Exception(
                 'error getting details: ' + details_response.commands.displayErrorMessage + " for: " + package_name)
         return details
 
@@ -161,9 +162,9 @@ class GooglePlayCrawler(object):
         review_response.ParseFromString(response.content)
 
         if not review_response:
-            RuntimeError('Could not get reviews for: ' + package_name)
+            raise Exception('Could not get reviews for: ' + package_name)
         if review_response.commands.displayErrorMessage != "":
-            RuntimeError(
+            raise Exception(
                 'error getting reviews: ' + review_response.commands.displayErrorMessage + " for: " + package_name)
         return review_response.payload.reviewResponse.getResponse
 
@@ -192,9 +193,9 @@ class GooglePlayCrawler(object):
         delivery_response.ParseFromString(response.content)
 
         if not delivery_response:
-            logging.error('Could not get download url for: ' + package_name)
+            raise Exception('Could not get download url for: ' + package_name)
         if delivery_response.commands.displayErrorMessage != "":
-            logging.error(
+            raise Exception(
                 'error getting download url: ' + delivery_response.commands.displayErrorMessage + " for: " + package_name)
         return delivery_response.payload.deliveryResponse.appDeliveryData.downloadUrl
 
@@ -206,7 +207,7 @@ class GooglePlayCrawler(object):
         """
 
         if version_code is None:
-            raise RuntimeError('no version code for purchase')
+            raise Exception('no version code for purchase')
 
         headers = {
             "X-DFE-Encoded-Targets": "CAEScFfqlIEG6gUYogFWrAISK1WDAg+hAZoCDgIU1gYEOIACFkLMAeQBnASLATlASUuyAyqCAjY5igOMBQzfA/IClwFbApUC4ANbtgKVAS7OAX8YswHFBhgDwAOPAmGEBt4OfKkB5weSB5AFASkiN68akgMaxAMSAQEBA9kBO7UBFE1KVwIDBGs3go6BBgEBAgMECQgJAQIEAQMEAQMBBQEBBAUEFQYCBgUEAwMBDwIBAgOrARwBEwMEAg0mrwESfTEcAQEKG4EBMxghChMBDwYGASI3hAEODEwXCVh/EREZA4sBYwEdFAgIIwkQcGQRDzQ2fTC2AjfVAQIBAYoBGRg2FhYFBwEqNzACJShzFFblAo0CFxpFNBzaAd0DHjIRI4sBJZcBPdwBCQGhAUd2A7kBLBVPngEECHl0UEUMtQETigHMAgUFCc0BBUUlTywdHDgBiAJ+vgKhAU0uAcYCAWQ/5ALUAw1UwQHUBpIBCdQDhgL4AY4CBQICjARbGFBGWzA1CAEMOQH+BRAOCAZywAIDyQZ2MgM3BxsoAgUEBwcHFia3AgcGTBwHBYwBAlcBggFxSGgIrAEEBw4QEqUCASsWadsHCgUCBQMD7QICA3tXCUw7ugJZAwGyAUwpIwM5AwkDBQMJA5sBCw8BNxBVVBwVKhebARkBAwsQEAgEAhESAgQJEBCZATMdzgEBBwG8AQQYKSMUkAEDAwY/CTs4/wEaAUt1AwEDAQUBAgIEAwYEDx1dB2wGeBFgTQ",
@@ -233,7 +234,7 @@ class GooglePlayCrawler(object):
 
         response = apkfetch_pb2.ResponseWrapper.FromString(response.content)
         if response.commands.displayErrorMessage != "":
-            RuntimeError(
+            raise Exception(
                 'error performing purchase: ' + response.commands.displayErrorMessage + " for: " + package_name)
         else:
             download_token = response.payload.buyResponse.downloadToken
@@ -289,9 +290,9 @@ class GooglePlayCrawler(object):
         # print(related_response.preFetch[0].response.payload.listResponse.doc)
 
         if not related_response:
-            RuntimeError('Could not get related apps for')
+            raise Exception('Could not get related apps for')
         if related_response.commands.displayErrorMessage != "":
-            RuntimeError('error getting related apps: ' + related_response.commands.displayErrorMessage)
+            raise Exception('error getting related apps: ' + related_response.commands.displayErrorMessage)
         return related_response.preFetch[0].response.payload.listResponse.doc[0]
 
     def get_category(self, url):
@@ -449,27 +450,49 @@ class GooglePlayCrawler(object):
     def crawl(self, package_name, visited_packages, max_iterations=1):
         """
         crawls through the google play store, provided with a starting package
+        This is a recursive function. it crawls through the app, gets the information,
+        the apk file and the related apps and moves on crawling through the related apps using recursion
         @package_name: the package to start from
-        @visitedpackages: a list of packages already visited
+        @visited_packages: a list of packages already visited
+        @max_iterations: the (max) amount of apps to crawl through
         """
 
-        time.sleep(1)
+        time.sleep(WAIT)
         self.iter += 1
+        related_apps = []
 
         try:
             related_apps = self.visit_app(package_name)
         except Exception as e:
             print('Error:', str(e))
-            logging.error('error: ' + str(e) + ".\n Probably a server timeout. Waiting and trying again.")
-            time.sleep(10)
 
-            try:
-                related_apps = self.visit_app(package_name)
-            except Exception as e:
-                print('Error:', str(e))
-                logging.critical('critical error: ' + str(e) + ".\n Second try failed. Skipping this app and moving "
-                                                               "on to the next")
-                return
+            if "Server busy" in str(e):  # in case of a timeout, we have to wait a while to be able to request again.
+                logging.error('error: ' + str(e) + ".\n Server Timeout. Waiting 10 min and tying again. attempt 1 out of 5")
+                time.sleep(600)
+                for i in range(4):
+                    try:
+                        related_apps = self.visit_app(package_name)
+                    except Exception as e:
+                        print('Error:', str(e))
+                        logging.critical(
+                            'critical error: ' + str(e) + ".\n trying again. Waiting 10 min. attempt "+str(i+2)+" out of 5")
+                        time.sleep(600)
+                        if i == 3:
+                            logging.info("moving on to the next app")
+                            return
+
+            else:  # in case of a response error, we wait a short while and try again.
+                logging.error('error: ' + str(e) + ".\n Probably a server timeout. Waiting 60 sec and trying again.")
+                time.sleep(60)
+
+                try:
+                    related_apps = self.visit_app(package_name)
+                except Exception as e:
+                    print('Error:', str(e))
+                    logging.critical('critical error: ' + str(e) + ".\n Second try failed. Skipping this app and moving "
+                                                                   "on to the next")
+                    time.sleep(10)
+                    return
 
         for app in related_apps:
             if app.docid not in visited_packages and self.iter < max_iterations:
