@@ -37,6 +37,5 @@ optional arguments:
   --iterations ITERATIONS, -i ITERATIONS
                         Amount of apps you want to crawl through
 
-Process finished with exit code 0
 
 ``` 
