@@ -536,7 +536,7 @@ def main(argv):
     parser.add_argument('--iterations', '-i', help='Amount of apps you want to crawl through', type=int)
 
     # prepare logging file
-    logging.basicConfig(filename=datetime.now().strftime("logs"+os.sep+"%Y-%m-%d_%H:%M:%S.log"), level=logging.INFO,
+    logging.basicConfig(filename=datetime.now().strftime("logs"+os.sep+"%Y-%m-%d_%H-%M-%S.log"), level=logging.INFO,
                         format="%(asctime)s - %(levelname)s: %(message)s")
 
     # start timing the program
