@@ -8,7 +8,7 @@ PAGE = '<li class="devsite-nav-item"><a href="#ACCEPT_HANDOVER" class="devsite-n
 
 
 def main(argv):
-    with open("apps/data/appinfo.csv", "w") as csvfile:
+    with open("apps/data/appinfo.csv", "w", encoding="utf8") as csvfile:
         file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         file.writerow(
             ['Pkgname', 'backendPkgname', 'Title', 'Description', 'ShortDescription', 'Url', 'RelatedAppsLink',
@@ -19,12 +19,12 @@ def main(argv):
              'AndroidVersion', 'FileSize', 'isUnstable', 'hasInstantLink', 'containsAds'])
         csvfile.close()
 
-    with open("apps/data/externalpermissions.csv", "w") as csvfile:
+    with open("apps/data/externalpermissions.csv", "w", encoding="utf8") as csvfile:
         file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         file.writerow(["Pkgname", "ExternalPermissions"])
         csvfile.close()
 
-    with open("apps/data/images.csv", "w") as csvfile:
+    with open("apps/data/images.csv", "w", encoding="utf8") as csvfile:
         file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         file.writerow(["Pkgname", "ImageUrls"])
         csvfile.close()
@@ -33,12 +33,12 @@ def main(argv):
     permissions = tree.xpath('//span[@class="devsite-nav-text"]/text()')
     permissions = ["Pkgname"] + ["android.permission." + p for p in permissions]
 
-    with open("apps/data/permissions.csv", "w") as csvfile:
+    with open("apps/data/permissions.csv", "w", encoding="utf8") as csvfile:
         file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         file.writerow(permissions)
         csvfile.close()
 
-    with open("apps/data/reviews.csv", "w") as csvfile:
+    with open("apps/data/reviews.csv", "w", encoding="utf8") as csvfile:
         file = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         file.writerow(
             ['Pkgname', 'documentVersion', 'timestampMsec', 'starRating', 'comment', 'personId', 'name', 'image'])

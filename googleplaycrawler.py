@@ -19,7 +19,7 @@ NO_DUPLICATE_DATA = True  # whether the app should check if the starting app is 
 REVIEWS = 50  # amount of reviews to get per app
 WAIT = 1  # seconds to wait before crawling the next app
 
-DOWNLOAD_FOLDER_PATH = 'apps/'
+DOWNLOAD_FOLDER_PATH = 'apps'+os.sep
 
 GOOGLE_LOGIN_URL = 'https://android.clients.google.com/auth'
 GOOGLE_CHECKIN_URL = 'https://android.clients.google.com/checkin'
@@ -334,12 +334,14 @@ class GooglePlayCrawler(object):
         :return: a list of previously crawled apps
         """
 
-        with open("apps/data/appinfo.csv", "r") as csvfile:
+        with open("apps"+os.sep+"data"+os.sep+"appinfo.csv", "r", encoding="utf8") as csvfile:
             file = csv.reader(csvfile, delimiter=',', quotechar='"')
             visited_apps = []
 
             for row in file:
-                visited_apps += [row[0]]
+                if row:
+                    print(row)
+                    visited_apps += [row[0]]
 
             csvfile.close()
 
@@ -358,7 +360,7 @@ class GooglePlayCrawler(object):
         :param related_apps: a list of related apps
         """
 
-        with open("apps/data/appinfo.csv", "a") as csv_file:
+        with open("apps"+os.sep+"data"+os.sep+"appinfo.csv", "a", encoding="utf8") as csv_file:
 
             related_apps_string = ""
             for app in related_apps:
@@ -396,8 +398,8 @@ class GooglePlayCrawler(object):
                            details.details.appDetails.hasInstantLink, details.details.appDetails.containsAds])
             csv_file.close()
 
-        with open("apps/data/permissions.csv", "a") as csv_file:
-            with open("templatePermissions.csv", "r") as permissionsFile:
+        with open("apps"+os.sep+"data"+os.sep+"permissions.csv", "a", encoding="utf8") as csv_file:
+            with open("templatePermissions.csv", "r", encoding="utf8") as permissionsFile:
                 permissions = csv.reader(permissionsFile, delimiter=',', quotechar='"')
                 file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 has_permission = [details.docid]
@@ -411,7 +413,7 @@ class GooglePlayCrawler(object):
                 permissionsFile.close()
             csv_file.close()
 
-        with open("apps/data/externalpermissions.csv", "a") as csv_file:
+        with open("apps"+os.sep+"data"+os.sep+"externalpermissions.csv", "a", encoding="utf8") as csv_file:
             file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             external_permissions = [details.docid]
             for row in details.details.appDetails.permission:
@@ -421,7 +423,7 @@ class GooglePlayCrawler(object):
             file.writerow(external_permissions)
             csv_file.close()
 
-        with open("apps/data/images.csv", "a") as csv_file:
+        with open("apps"+os.sep+"data"+os.sep+"images.csv", "a", encoding="utf8") as csv_file:
             file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             image_urls = [details.docid]
             for image in details.image:
@@ -430,7 +432,7 @@ class GooglePlayCrawler(object):
             file.writerow(image_urls)
             csv_file.close()
 
-        with open("apps/data/reviews.csv", "a") as csv_file:
+        with open("apps"+os.sep+"data"+os.sep+"reviews.csv", "a", encoding="utf8") as csv_file:
             file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
             for data in reviews.review:
@@ -536,7 +538,7 @@ def main(argv):
     parser.add_argument('--iterations', '-i', help='Amount of apps you want to crawl through', type=int)
 
     # prepare logging file
-    logging.basicConfig(filename=datetime.now().strftime("logs/%Y-%m-%d_%H:%M:%S.log"), level=logging.INFO,
+    logging.basicConfig(filename=datetime.now().strftime("logs"+os.sep+"%Y-%m-%d_%H-%M-%S.log"), level=logging.INFO,
                         format="%(asctime)s - %(levelname)s: %(message)s")
 
     # start timing the program
