@@ -361,7 +361,6 @@ class GooglePlayCrawler(object):
         """
 
         with open("apps"+os.sep+"data"+os.sep+"appinfo.csv", "a", encoding="utf8") as csv_file:
-
             related_apps_string = ""
             for app in related_apps:
                 related_apps_string += app.docid + ","
