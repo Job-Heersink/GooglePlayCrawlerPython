@@ -340,7 +340,6 @@ class GooglePlayCrawler(object):
 
             for row in file:
                 if row:
-                    print(row)
                     visited_apps += [row[0]]
 
             csvfile.close()

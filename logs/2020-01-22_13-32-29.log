@@ -1,0 +1,11 @@
+2020-01-22 13:32:31,038 - INFO: token: aas_et/AKppINYb7TSaQ7ZnYeAoRqLnPykKh8Jdt6Q_PqoGb4xfB_sC_3gdDb3PQTVbUXs6PvPV1fjubCVlcqvwbzPtyWlU2eirB24A-PM3Lc2WU3tHIE61Cn2T25WAJIejo9j3TUwRC7RwXtfcDDYlug8Q7jGu-Wsy2PkKFVUBRreS3LpwTdBvlVz3MrMzNegPLj-11IXtNJuy1ICyjOQYz1Up5uw=
+2020-01-22 13:32:31,125 - INFO: auth: tAfg_AOL5poW6AHfppj9dp1jgoh_ykJ09x6ZktfzEMfcFiBB-G12hNlcdfoFj2CugY1_4A.
+2020-01-22 13:32:32,125 - INFO: 0 previously crawled apps loaded. This crawler won't crawl through these apps.
+2020-01-22 13:32:32,125 - INFO: initiated crawling for 1000 apps
+2020-01-22 13:32:33,125 - INFO: started crawling through com.snapchat.android on iteration: 1
+2020-01-22 13:32:34,248 - INFO: successful purchase
+2020-01-22 13:32:34,781 - INFO: downloading...
+2020-01-22 13:32:57,552 - INFO: Downloaded version 2008
+2020-01-22 13:33:00,399 - INFO: started crawling through com.zhiliaoapp.musically on iteration: 2
+2020-01-22 13:33:01,675 - INFO: successful purchase
+2020-01-22 13:33:02,270 - INFO: downloading...
