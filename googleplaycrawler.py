@@ -413,21 +413,27 @@ class GooglePlayCrawler(object):
 
         with open("apps"+os.sep+"data"+os.sep+"externalpermissions.csv", "a", encoding="utf8") as csv_file:
             file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            external_permissions = [details.docid]
+            external_permissions = ""
             for row in details.details.appDetails.permission:
                 if not row.startswith("android.permission."):
-                    external_permissions += [row]
+                    external_permissions += row+", "
 
-            file.writerow(external_permissions)
+            if external_permissions:
+                external_permissions = external_permissions[:-2]
+
+            file.writerow([details.docid, external_permissions])
             csv_file.close()
 
         with open("apps"+os.sep+"data"+os.sep+"images.csv", "a", encoding="utf8") as csv_file:
             file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            image_urls = [details.docid]
+            image_urls = ""
             for image in details.image:
-                image_urls += [image.imageUrl]
+                image_urls += image.imageUrl+", "
 
-            file.writerow(image_urls)
+            if image_urls:
+                image_urls = image_urls[:-2]
+
+            file.writerow([details.docid, image_urls])
             csv_file.close()
 
         with open("apps"+os.sep+"data"+os.sep+"reviews.csv", "a", encoding="utf8") as csv_file:
