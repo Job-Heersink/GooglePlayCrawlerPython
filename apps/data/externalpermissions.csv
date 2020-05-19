@@ -1,2 +1,1 @@
-Pkgname,ExternalPermissions
-com.spotify.music,"com.android.launcher.permission.INSTALL_SHORTCUT, com.android.vending.BILLING, com.google.android.c2dm.permission.RECEIVE, com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE, com.samsung.WATCH_APP_TYPE.Companion, com.samsung.android.app.spage.permission.READ_CARD_DATA, com.samsung.android.app.spage.permission.WRITE_CARD_DATA, com.sony.snei.np.android.account.provider.permission.DUID_READ_PROVIDER, com.spotify.music.permission.C2D_MESSAGE, com.spotify.music.permission.INTERNAL_BROADCAST, com.spotify.music.permission.SECURED_BROADCAST"
+Pkgname,ExternalPermissions
