@@ -1,1 +1,0 @@
-2020-05-19 19:43:07,404 - CRITICAL: authentication error:user, passwd, androidid and package are required options. android ID can be found using Device id on your android device using an app from the playstore. terminating program
