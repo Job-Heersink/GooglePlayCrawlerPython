@@ -21,7 +21,7 @@ Note that you do need an androidid for this program to work, you can get an andr
 ```
 usage: googleplaycrawler.py [--help] [--user USER] [--passwd PASSWD]
                             [--androidid ANDROIDID] [--package PACKAGE]
-                            [--iterations ITERATIONS]
+                            [--iterations ITERATIONS] [--list LIST]
 
 Download APK files from the google play store and retrieve their information
 
@@ -36,6 +36,8 @@ optional arguments:
                         Package name of the app
   --iterations ITERATIONS, -i ITERATIONS
                         Amount of apps you want to crawl through
+  --list LIST, -l LIST  file name to read the list of apps to crawl through
+                        from
 
 
 ``` 
