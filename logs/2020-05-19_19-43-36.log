@@ -1,0 +1,11 @@
+2020-05-19 19:43:37,604 - INFO: token: aas_et/AKppINafRJUY9k_ZRYjYK1qCuYi3A1pH9UtDrq0ht_f9fTm5w7p2QRtw_UniUXBmoXsfDOGW7O-vztuHERKjjZ2M-YrtC6p7Rta1R14w06VG6TnFQnBl9zWFrnFhMMEcRvJWaJ7ENDU7q-bYgiP7zA9O7345FLVWOn_O2L29y_E1yPjgo-PWRgpYAJwX4CjR67D8FITx-SQF-eCrMBt19-I=
+2020-05-19 19:43:37,702 - INFO: auth: xAfg_LYn6m5J8U_mYqkPjhs00iVZ4rbZJJp3gQFDDonNwXb9GUgdfkup-Pk0S-1LVLgJRw.
+2020-05-19 19:43:38,703 - INFO: 0 previously crawled apps loaded. This crawler won't crawl through these apps.
+2020-05-19 19:43:38,703 - INFO: initiated crawling for 1000 apps
+2020-05-19 19:43:39,703 - INFO: started crawling through me.skyvpn.app on iteration: 1
+2020-05-19 19:43:41,203 - INFO: successful purchase
+2020-05-19 19:43:42,286 - INFO: downloading...
+2020-05-19 19:43:50,872 - INFO: Downloaded version 206
+2020-05-19 19:43:54,493 - INFO: started crawling through me.highvpn.app on iteration: 2
+2020-05-19 19:43:55,658 - INFO: successful purchase
+2020-05-19 19:43:56,406 - INFO: downloading...

@@ -19,7 +19,7 @@ NO_DUPLICATE_DATA = True  # whether the app should check if the starting app is 
 REVIEWS = 50  # amount of reviews to get per app
 WAIT = 1  # seconds to wait before crawling the next app
 
-DOWNLOAD_FOLDER_PATH = 'apps'+os.sep
+DOWNLOAD_FOLDER_PATH = 'apps' + os.sep
 
 GOOGLE_LOGIN_URL = 'https://android.clients.google.com/auth'
 GOOGLE_CHECKIN_URL = 'https://android.clients.google.com/checkin'
@@ -334,7 +334,7 @@ class GooglePlayCrawler(object):
         :return: a list of previously crawled apps
         """
 
-        with open("apps"+os.sep+"data"+os.sep+"appinfo.csv", "r", encoding="utf8") as csvfile:
+        with open("apps" + os.sep + "data" + os.sep + "appinfo.csv", "r", encoding="utf8") as csvfile:
             file = csv.reader(csvfile, delimiter=',', quotechar='"')
             visited_apps = []
 
@@ -351,6 +351,22 @@ class GooglePlayCrawler(object):
             str(len(visited_apps)) + " previously crawled apps loaded. This crawler won't crawl through these apps.")
         return visited_apps
 
+    def load_app_list(self, file_name):
+        if not file_name.endswith(".csv"):
+            print("we can only load app names from csv files. adding .csv extension to file name")
+            file_name = file_name + ".csv"
+
+        app_list = []
+
+        with open(file_name, "r", encoding="utf8") as csv_file:
+            file = csv.reader(csv_file, delimiter=',', quotechar='"')
+
+            for row in file:
+                for e in row:
+                    app_list.append(e)
+
+        return app_list
+
     def store(self, details, reviews, related_apps):
         """
         store the details and reviews of an app into a .csv file
@@ -359,7 +375,7 @@ class GooglePlayCrawler(object):
         :param related_apps: a list of related apps
         """
 
-        with open("apps"+os.sep+"data"+os.sep+"appinfo.csv", "a", encoding="utf8") as csv_file:
+        with open("apps" + os.sep + "data" + os.sep + "appinfo.csv", "a", encoding="utf8") as csv_file:
             related_apps_string = ""
             for app in related_apps:
                 related_apps_string += app.docid + ","
@@ -396,7 +412,7 @@ class GooglePlayCrawler(object):
                            details.details.appDetails.hasInstantLink, details.details.appDetails.containsAds])
             csv_file.close()
 
-        with open("apps"+os.sep+"data"+os.sep+"permissions.csv", "a", encoding="utf8") as csv_file:
+        with open("apps" + os.sep + "data" + os.sep + "permissions.csv", "a", encoding="utf8") as csv_file:
             with open("templatePermissions.csv", "r", encoding="utf8") as permissionsFile:
                 permissions = csv.reader(permissionsFile, delimiter=',', quotechar='"')
                 file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -411,12 +427,12 @@ class GooglePlayCrawler(object):
                 permissionsFile.close()
             csv_file.close()
 
-        with open("apps"+os.sep+"data"+os.sep+"externalpermissions.csv", "a", encoding="utf8") as csv_file:
+        with open("apps" + os.sep + "data" + os.sep + "externalpermissions.csv", "a", encoding="utf8") as csv_file:
             file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             external_permissions = ""
             for row in details.details.appDetails.permission:
                 if not row.startswith("android.permission."):
-                    external_permissions += row+", "
+                    external_permissions += row + ", "
 
             if external_permissions:
                 external_permissions = external_permissions[:-2]
@@ -424,11 +440,11 @@ class GooglePlayCrawler(object):
             file.writerow([details.docid, external_permissions])
             csv_file.close()
 
-        with open("apps"+os.sep+"data"+os.sep+"images.csv", "a", encoding="utf8") as csv_file:
+        with open("apps" + os.sep + "data" + os.sep + "images.csv", "a", encoding="utf8") as csv_file:
             file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             image_urls = ""
             for image in details.image:
-                image_urls += image.imageUrl+", "
+                image_urls += image.imageUrl + ", "
 
             if image_urls:
                 image_urls = image_urls[:-2]
@@ -436,7 +452,7 @@ class GooglePlayCrawler(object):
             file.writerow([details.docid, image_urls])
             csv_file.close()
 
-        with open("apps"+os.sep+"data"+os.sep+"reviews.csv", "a", encoding="utf8") as csv_file:
+        with open("apps" + os.sep + "data" + os.sep + "reviews.csv", "a", encoding="utf8") as csv_file:
             file = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
             for data in reviews.review:
@@ -476,7 +492,7 @@ class GooglePlayCrawler(object):
 
         return related_apps.child
 
-    def crawl(self, package_name, visited_packages, max_iterations=1):
+    def crawl(self, package_name, visited_packages=None, max_iterations=1):
         """
         crawls through the google play store, provided with a starting package
         This is a recursive function. it crawls through the app, gets the information,
@@ -486,25 +502,31 @@ class GooglePlayCrawler(object):
         :param max_iterations: the (max) amount of apps to crawl through
         """
 
+        if visited_packages is None:
+            visited_packages = []
         time.sleep(WAIT)
         self.iter += 1
-        related_apps = []
+        crawl_next = []
 
         try:
-            related_apps = self.visit_app(package_name)
+            crawl_next = self.visit_app(package_name)
+
         except Exception as e:
             print('Error:', str(e))
 
             if "Server busy" in str(e):  # in case of a timeout, we have to wait a while to be able to request again.
-                logging.error('error: ' + str(e) + ".\n Server Timeout. Waiting 10 min and tying again. attempt 1 out of 5")
+                logging.error(
+                    'error: ' + str(e) + ".\n Server Timeout. Waiting 10 min and tying again. attempt 1 out of 5")
                 time.sleep(600)
                 for i in range(4):
                     try:
-                        related_apps = self.visit_app(package_name)
+                        crawl_next = self.visit_app(package_name)
+
                     except Exception as e:
                         print('Error:', str(e))
                         logging.critical(
-                            'critical error: ' + str(e) + ".\n trying again. Waiting 10 min. attempt "+str(i+2)+" out of 5")
+                            'critical error: ' + str(e) + ".\n trying again. Waiting 10 min. attempt " + str(
+                                i + 2) + " out of 5")
                         time.sleep(600)
                         if i == 3:
                             logging.info("moving on to the next app")
@@ -515,15 +537,17 @@ class GooglePlayCrawler(object):
                 time.sleep(60)
 
                 try:
-                    related_apps = self.visit_app(package_name)
+                    crawl_next = self.visit_app(package_name)
+
                 except Exception as e:
                     print('Error:', str(e))
-                    logging.critical('critical error: ' + str(e) + ".\n Second try failed. Skipping this app and moving "
-                                                                   "on to the next")
+                    logging.critical(
+                        'critical error: ' + str(e) + ".\n Second try failed. Skipping this app and moving "
+                                                      "on to the next")
                     time.sleep(10)
                     return
 
-        for app in related_apps:
+        for app in crawl_next:
             if app.docid not in visited_packages and self.iter < max_iterations:
                 visited_packages += [app.docid]
                 self.crawl(app.docid, visited_packages, max_iterations)
@@ -540,9 +564,10 @@ def main(argv):
     parser.add_argument('--androidid', '-a', help='AndroidID')
     parser.add_argument('--package', '-k', help='Package name of the app')
     parser.add_argument('--iterations', '-i', help='Amount of apps you want to crawl through', type=int)
+    parser.add_argument("--list", '-l', help='file name to read the list of apps to crawl through from', type=str)
 
     # prepare logging file
-    logging.basicConfig(filename=datetime.now().strftime("logs"+os.sep+"%Y-%m-%d_%H-%M-%S.log"), level=logging.INFO,
+    logging.basicConfig(filename=datetime.now().strftime("logs" + os.sep + "%Y-%m-%d_%H-%M-%S.log"), level=logging.INFO,
                         format="%(asctime)s - %(levelname)s: %(message)s")
 
     # start timing the program
@@ -557,11 +582,16 @@ def main(argv):
         android_id = args.androidid
         package = args.package
         max_iterations = args.iterations
+        app_list_file = args.list
 
-        if not user or not password or not package or not android_id:
+        if not user or not password or not android_id or (not package and not app_list_file):
             parser.print_usage()
             raise ValueError('user, passwd, androidid and package are required options. android ID can be found using '
                              'Device id on your android device using an app from the playstore')
+
+        if app_list_file and package:
+            raise ValueError(
+                'you cannot fill in a starting package and a list of apps to crawl through. The crawler will start from the app_list_file')
 
         # create class
         apk = GooglePlayCrawler()
@@ -581,7 +611,13 @@ def main(argv):
         sys.exit(1)
 
     visited_apps = apk.load_visited_apps()
-    if package not in visited_apps or not NO_DUPLICATE_DATA:
+    if not app_list_file is None:
+        app_list = apk.load_app_list(app_list_file)
+        logging.info("initiated crawling for " + str(len(app_list)) + " apps using list from file: " + app_list_file)
+        for app in app_list:
+            apk.crawl(app, [])
+
+    elif package not in visited_apps or not NO_DUPLICATE_DATA:
         logging.info("initiated crawling for " + str(max_iterations) + " apps")
         apk.crawl(package, visited_apps, max_iterations)
     else:

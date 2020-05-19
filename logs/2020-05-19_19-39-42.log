@@ -1,0 +1,35 @@
+2020-05-19 19:39:43,630 - INFO: token: aas_et/AKppINZfcpnMs9QJiKntWqAwuHi9n9-CY5jkoqbxhDn2W9aiPkVTjoqpW0SSbBT2DKimDlt7WU71nLzqNDpaEWG8wObKT6HOiVMIzyfDlXx_YQMfLOogh11Q5fY8nezbYAYTJYqU0RJ3Bfnqb34yFLj7lHKb7MvDGCbktaGLQqiTIkNczvYyGS11NZkY4caT8d2e7s4Gjmo9mDs_WChOmdk=
+2020-05-19 19:39:43,774 - INFO: auth: xAfg_Hbdu3g7QOyZ4e8sBGnlQD-Mbf05VXCOsn2bx3KRHDcxlSEo8wfEW3lv26DuaCRt8w.
+2020-05-19 19:39:44,775 - INFO: 3 previously crawled apps loaded. This crawler won't crawl through these apps.
+2020-05-19 19:39:44,776 - INFO: initiated crawling for 39 apps using list from file: app_list
+2020-05-19 19:39:45,777 - INFO: started crawling through com.spotify.music on iteration: 1
+2020-05-19 19:39:47,027 - INFO: successful purchase
+2020-05-19 19:39:47,804 - INFO: downloading...
+2020-05-19 19:39:55,601 - INFO: Downloaded version 59513369
+2020-05-19 19:39:59,158 - INFO: started crawling through com.soundcloud.android on iteration: 2
+2020-05-19 19:40:00,404 - INFO: successful purchase
+2020-05-19 19:40:01,280 - INFO: downloading...
+2020-05-19 19:40:11,775 - INFO: Downloaded version 21110
+2020-05-19 19:40:14,029 - INFO: started crawling through com.audiomack on iteration: 3
+2020-05-19 19:40:15,411 - INFO: successful purchase
+2020-05-19 19:40:16,214 - INFO: downloading...
+2020-05-19 19:40:24,008 - INFO: Downloaded version 7104
+2020-05-19 19:40:26,342 - INFO: started crawling through com.dywx.larkplayer on iteration: 4
+2020-05-19 19:40:27,526 - INFO: successful purchase
+2020-05-19 19:40:28,466 - INFO: downloading...
+2020-05-19 19:40:33,259 - INFO: Downloaded version 23130507
+2020-05-19 19:40:35,122 - INFO: started crawling through com.mxtech.videoplayer.ad on iteration: 5
+2020-05-19 19:40:36,662 - INFO: successful purchase
+2020-05-19 19:40:37,461 - INFO: downloading...
+2020-05-19 19:40:51,928 - INFO: Downloaded version 1330001215
+2020-05-19 19:40:54,247 - INFO: started crawling through video.player.videoplayer on iteration: 6
+2020-05-19 19:40:55,937 - INFO: successful purchase
+2020-05-19 19:40:56,599 - INFO: downloading...
+2020-05-19 19:41:02,834 - INFO: Downloaded version 32173
+2020-05-19 19:41:04,601 - INFO: started crawling through com.opera.mini.native on iteration: 7
+2020-05-19 19:41:06,047 - INFO: successful purchase
+2020-05-19 19:41:06,861 - INFO: downloading...
+2020-05-19 19:41:12,315 - INFO: Downloaded version 473147957
+2020-05-19 19:41:14,074 - INFO: started crawling through com.opera.browser on iteration: 8
+2020-05-19 19:41:15,808 - INFO: successful purchase
+2020-05-19 19:41:16,590 - INFO: downloading...

@@ -1,0 +1,8 @@
+2020-05-19 19:35:19,480 - INFO: token: aas_et/AKppINYOVVG90J_JwtpIiJJqlaeFc-hlz6_6OSj3fcnNwVOaVtkSTTjXjSO9BO3uOn-Y7rhNEVywgVc6erRzog2sCIWl6v6NlYg8TBp1DRDcYPjSLklxcFrtZ7WQamCNXjoNMp58qctWnrCQ_k4bnu74n9IRzFYoPEoj0nEQKruvMdyXtE4ZHnSzsXPJ1rUms7AtwAKqJifyoUzDvcggwDA=
+2020-05-19 19:35:19,581 - INFO: auth: xAfg_DFQhOAwZQ2IRHV43o7jjgSU4WLbGtOvjtQjbndBsGT0N8A12moyk0ZqzlsXnrpg_w.
+2020-05-19 19:35:20,587 - INFO: 2 previously crawled apps loaded. This crawler won't crawl through these apps.
+2020-05-19 19:35:20,587 - INFO: initiated crawling for 1000 apps using list from file: app_list
+2020-05-19 19:35:21,588 - INFO: started crawling through com.spotify.music on iteration: 1
+2020-05-19 19:35:23,278 - INFO: successful purchase
+2020-05-19 19:35:24,387 - INFO: downloading...
+2020-05-19 19:35:32,178 - INFO: Downloaded version 59513369

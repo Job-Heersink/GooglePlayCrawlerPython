@@ -1,0 +1,1 @@
+2020-05-19 19:34:34,260 - CRITICAL: authentication error:you cannot fill in a starting package and a list of apps to crawl through. The crawler will start from the app_list_file. terminating program
