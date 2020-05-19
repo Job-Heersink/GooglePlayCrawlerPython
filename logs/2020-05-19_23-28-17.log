@@ -1,0 +1,11 @@
+2020-05-19 23:28:18,703 - INFO: token: aas_et/AKppINbqc4DuC5yfhvz13aI62LdM6lWuSN3UNt_nr2osMvlZTfFC7shL67neMvLtjz4rW1Y-BVb2weSLo6mjfhTZUZvY7BWSzT2eQqG9RGnXEVTKW4yzzS5SQcgyuViHYwJvU7PO4AqjgLhpy6c_b9FIfSQSUCsmWGT2MrMn7pE2FHIMGKLAcNXV3PdZLKSRsYwJMF-NasUEPyD9i_Js6Fs=
+2020-05-19 23:28:18,821 - INFO: auth: xQfg_Ea4GMhW8sF2SKdKZDkQU1mvd6Z8rMQTMYcCUbCeEee5dwPmHZRfUggnYzAlrOkavg.
+2020-05-19 23:28:19,824 - INFO: 0 previously crawled apps loaded. This crawler won't crawl through these apps.
+2020-05-19 23:28:19,825 - INFO: initiated crawling for 9 apps using list from file: app_list.csv
+2020-05-19 23:28:20,826 - INFO: started crawling through com.spotify.music on iteration: 1
+2020-05-19 23:28:22,612 - INFO: successful purchase
+2020-05-19 23:28:23,361 - INFO: downloading...
+2020-05-19 23:28:31,481 - INFO: Downloaded version 59513369
+2020-05-19 23:28:34,906 - INFO: started crawling through com.soundcloud.android on iteration: 2
+2020-05-19 23:28:36,105 - INFO: successful purchase
+2020-05-19 23:28:36,799 - INFO: downloading...

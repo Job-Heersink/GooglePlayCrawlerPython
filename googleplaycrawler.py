@@ -566,6 +566,10 @@ def main(argv):
     parser.add_argument('--iterations', '-i', help='Amount of apps you want to crawl through', type=int)
     parser.add_argument("--list", '-l', help='file name to read the list of apps to crawl through from', type=str)
 
+    #make sure logs exists
+    if not os.path.isdir('logs'):
+        os.mkdir('logs')
+
     # prepare logging file
     logging.basicConfig(filename=datetime.now().strftime("logs" + os.sep + "%Y-%m-%d_%H-%M-%S.log"), level=logging.INFO,
                         format="%(asctime)s - %(levelname)s: %(message)s")
